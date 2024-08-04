@@ -1,0 +1,12 @@
+services:
+  rosmaster:
+    image: ros:kinetic-ros-core
+    network_mode: host
+    restart: on-failure
+    environment:
+      - ROS_MASTER_URI=${ROS_MSTR_URI}
+      - ROS_IP=${ROS_IP}
+    command: stdbuf -o L roscore
+    
+  # rosbag:
+  #   image: ros:
