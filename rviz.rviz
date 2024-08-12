@@ -7,9 +7,8 @@ Panels:
         - /Global Options1
         - /Status1
         - /Odometry1
-        - /Odometry1/Status1
         - /Path1
-        - /Path1/Status1
+        - /PointCloud21
       Splitter Ratio: 0.5
     Tree Height: 756
   - Class: rviz/Selection
@@ -29,7 +28,7 @@ Panels:
   - Class: rviz/Time
     Name: Time
     SyncMode: 0
-    SyncSource: ""
+    SyncSource: PointCloud2
 Preferences:
   PromptSaveOnExit: true
 Toolbars:
@@ -114,6 +113,34 @@ Visualization Manager:
       Topic: /islam/vlp_path
       Unreliable: false
       Value: true
+    - Alpha: 1
+      Autocompute Intensity Bounds: true
+      Autocompute Value Bounds:
+        Max Value: 10
+        Min Value: -10
+        Value: true
+      Axis: Z
+      Channel Name: intensity
+      Class: rviz/PointCloud2
+      Color: 255; 255; 255
+      Color Transformer: Intensity
+      Decay Time: 0
+      Enabled: true
+      Invert Rainbow: false
+      Max Color: 255; 255; 255
+      Min Color: 0; 0; 0
+      Name: PointCloud2
+      Position Transformer: XYZ
+      Queue Size: 10
+      Selectable: true
+      Size (Pixels): 3
+      Size (m): 0.009999999776482582
+      Style: Flat Squares
+      Topic: /islam/vlp_pts
+      Unreliable: false
+      Use Fixed Frame: true
+      Use rainbow: true
+      Value: true
   Enabled: true
   Global Options:
     Background Color: 48; 48; 48
@@ -142,7 +169,7 @@ Visualization Manager:
   Views:
     Current:
       Class: rviz/Orbit
-      Distance: 0.0013263017171993852
+      Distance: 21.051124572753906
       Enable Stereo Rendering:
         Stereo Eye Separation: 0.05999999865889549
         Stereo Focal Distance: 1
@@ -150,17 +177,17 @@ Visualization Manager:
         Value: false
       Field of View: 0.7853981852531433
       Focal Point:
-        X: -23.282424926757812
-        Y: 26.831798553466797
-        Z: 20.48358154296875
-      Focal Shape Fixed Size: true
+        X: 0
+        Y: 0
+        Z: 0
+      Focal Shape Fixed Size: false
       Focal Shape Size: 0.05000000074505806
       Invert Z Axis: false
       Name: Current View
       Near Clip Distance: 0.009999999776482582
-      Pitch: -0.5552030205726624
+      Pitch: 0.040398623794317245
       Target Frame: <Fixed Frame>
-      Yaw: 1.5603944063186646
+      Yaw: 1.0903979539871216
     Saved: ~
 Window Geometry:
   Displays:

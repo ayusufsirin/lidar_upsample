@@ -34,11 +34,13 @@ rosrun topic_tools transform $vlp_odom_s $vlp_odom_p nav_msgs/Odometry 'nav_msgs
     pose=geometry_msgs.msg.PoseWithCovariance(
         pose=geometry_msgs.msg.Pose(
             position=m.pose.pose.position,
-            orientation=geometry_msgs.msg.Quaternion(
-                x=m.pose.pose.orientation.x * 0.7071068 - m.pose.pose.orientation.z * 0.7071068,
-                y=m.pose.pose.orientation.y * 0.7071068 - m.pose.pose.orientation.w * 0.7071068,
-                z=m.pose.pose.orientation.z * 0.7071068 + m.pose.pose.orientation.x * 0.7071068,
-                w=m.pose.pose.orientation.w * 0.7071068 + m.pose.pose.orientation.y * 0.7071068)),
+            orientation=m.pose.pose.orientation,
+            # orientation=geometry_msgs.msg.Quaternion(
+            #     x=m.pose.pose.orientation.x * 0.7071068 - m.pose.pose.orientation.z * 0.7071068,
+            #     y=m.pose.pose.orientation.y * 0.7071068 - m.pose.pose.orientation.w * 0.7071068,
+            #     z=m.pose.pose.orientation.z * 0.7071068 + m.pose.pose.orientation.x * 0.7071068,
+            #     w=m.pose.pose.orientation.w * 0.7071068 + m.pose.pose.orientation.y * 0.7071068)
+            ),
         covariance=m.pose.covariance),
     twist=m.twist)' --import nav_msgs std_msgs geometry_msgs&
 
