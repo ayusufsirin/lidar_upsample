@@ -1,3 +1,13 @@
+# LIDAR Upsample
+
+Current dependencies:
+
+- ROS Noetic
+- Ubuntu 20.04
+- Python 3.8.10
+
+## Run
+
 ```bash
 source /opt/ros/noetic/setup.bash
 cd /home/joseph/Development/DS
