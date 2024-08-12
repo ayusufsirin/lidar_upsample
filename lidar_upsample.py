@@ -17,6 +17,9 @@ class PointCloudTransformer:
         rospy.Subscriber('/islam/vlp_pts', PointCloud2, self.point_cloud_callback)
         rospy.Subscriber('/islam/vlp_odom', Odometry, self.odometry_callback)
 
+        # Initialize publisher
+        self.pub = rospy.Publisher('/transformed_point_cloud', PointCloud2, queue_size=10)
+
     def odometry_callback(self, msg):
         # Extract translation and rotation from the odometry message
         self.translation = [
@@ -37,16 +40,22 @@ class PointCloudTransformer:
             return
 
         # Convert the PointCloud2 message to a list of points
-        point_list = list(pc2.read_points(point_cloud_msg, skip_nans=True))
+        point_list = list(pc2.read_points(point_cloud_msg, skip_nans=True, field_names=("x", "y", "z")))
 
         # Transform the point cloud using odometry data
         transformed_points = self.transform_point_cloud(point_list, self.translation, self.rotation)
 
-        # Process the transformed points here (e.g., print the first point)
-        if transformed_points:
-            rospy.loginfo("First transformed point: {}".format(transformed_points[0]))
-        else:
-            rospy.logwarn("No points found in the point cloud.")
+        # Add additional fields from the original point cloud
+        new_points = []
+        for i, original_point in enumerate(pc2.read_points(point_cloud_msg, skip_nans=True)):
+            new_point = list(transformed_points[i]) + list(original_point[3:])
+            new_points.append(new_point)
+
+        # Create a new PointCloud2 message with the transformed points
+        transformed_msg = pc2.create_cloud(point_cloud_msg.header, point_cloud_msg.fields, new_points)
+
+        # Publish the transformed point cloud
+        self.pub.publish(transformed_msg)
 
     def transform_point_cloud(self, point_cloud, translation, rotation):
         # Create a rotation matrix from the quaternion
