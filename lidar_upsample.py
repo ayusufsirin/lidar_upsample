@@ -2,7 +2,7 @@
 
 import rospy
 from sensor_msgs.msg import PointCloud2
-from nav_msgs.msg import Odometry, Path
+from nav_msgs.msg import Odometry
 import sensor_msgs.point_cloud2 as pc2
 import tf.transformations as transformations
 import numpy as np
@@ -16,29 +16,22 @@ class PointCloudTransformer:
         # Initialize subscribers
         rospy.Subscriber('/islam/vlp_pts', PointCloud2, self.point_cloud_callback)
         rospy.Subscriber('/islam/vlp_odom', Odometry, self.odometry_callback)
-        rospy.Subscriber('/islam/vlp_path', Path, self.path_callback)
 
         # Initialize publishers
         self.point_cloud_pub = rospy.Publisher('/transformed_point_cloud', PointCloud2, queue_size=10)
         self.odom_pub = rospy.Publisher('/transformed_odom', Odometry, queue_size=10)
-        self.path_pub = rospy.Publisher('/transformed_path', Path, queue_size=10)
-    
-    def path_callback(self, msg):
-        # TODO: Fill
-        
-        self.path_pub.publish(msg)
 
     def odometry_callback(self, msg):
         # Extract translation and rotation from the odometry message
         self.translation = [
-            msg.pose.pose.position.x, 
+            - msg.pose.pose.position.x, 
             msg.pose.pose.position.z, 
             0, # msg.pose.pose.position.y,
         ]
         original_rotation = [
             0, # msg.pose.pose.orientation.x,
             0, # msg.pose.pose.orientation.z,
-            - msg.pose.pose.orientation.y,
+            msg.pose.pose.orientation.y,
             msg.pose.pose.orientation.w
         ]
                 
