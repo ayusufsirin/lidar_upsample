@@ -7,6 +7,3 @@ services:
       - ROS_MASTER_URI=${ROS_MSTR_URI}
       - ROS_IP=${ROS_IP}
     command: stdbuf -o L roscore
-    
-  # rosbag:
-  #   image: ros:
