@@ -1,5 +1,11 @@
 #!/usr/bin/env python
 
+import csv
+import os
+import time
+from collections import deque
+from datetime import datetime
+
 import message_filters
 import numpy as np
 import rospy
@@ -11,6 +17,28 @@ from sensor_msgs.msg import PointCloud2
 
 class PointCloudTransformer:
     def __init__(self):
+        # Create a unique log file name with timestamp
+        self.processing_times = deque(maxlen=100)
+        self.timestamps = deque(maxlen=100)
+        self.message_count = 0
+        self.last_msg_time = None
+
+        # Create ./logs directory relative to script location
+        log_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), "logs")
+        os.makedirs(log_dir, exist_ok=True)
+
+        # Create a unique log file name with timestamp
+        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+        self.csv_file_path = os.path.join(log_dir, f"pointcloud_metrics_{timestamp}.csv")
+
+        # Open the file and create the CSV writer
+        self.csv_file = open(self.csv_file_path, mode='w', newline='')
+        self.csv_writer = csv.writer(self.csv_file)
+
+        # Write the CSV header
+        self.csv_writer.writerow(
+            ["ros_time", "pc_timestamp", "latency_sec", "processing_time_sec", "message_rate_Hz", "cumulative_points"])
+
         # Initialize a list to store cumulative transformed points
         self.cumulative_points = []
 
@@ -27,22 +55,42 @@ class PointCloudTransformer:
         self.cumulative_cloud_pub = rospy.Publisher('/cumulative_point_cloud', PointCloud2, queue_size=10)
         self.odom_pub = rospy.Publisher('/transformed_odom', Odometry, queue_size=10)
 
+    def calculate_rate(self):
+        if len(self.timestamps) < 2:
+            return 0.0
+        duration = self.timestamps[-1] - self.timestamps[0]
+        return len(self.timestamps) / duration if duration > 0 else 0.0
+
     def synced_callback(self, point_cloud_msg, odom_msg):
-        # rospy.loginfo("Synced callback")
-        # rospy.loginfo(
-        #     f"point_cloud_msg: {point_cloud_msg.header.stamp.secs}.{point_cloud_msg.header.stamp.nsecs}, "
-        #     f"odom_msg: {odom_msg.header.stamp.secs}.{odom_msg.header.stamp.nsecs}"
-        # )
-        # rospy.loginfo(
-        #     f"point_cloud_msg: {point_cloud_msg}, "
-        #     f"odom_msg: {odom_msg}"
-        # )
+        start_time = time.time()
+
+        # Latency
+        pc_time = point_cloud_msg.header.stamp.to_sec()
+        now = rospy.Time.now().to_sec()
+        latency = now - pc_time
+
+        self.timestamps.append(pc_time)
+        self.message_count += 1
 
         translation, rotation, transformed_odom_msg = self.odometry_callback(odom_msg)
         self.point_cloud_callback(point_cloud_msg, translation, rotation)
-
-        # Publish the transformed odometry message
         self.odom_pub.publish(transformed_odom_msg)
+
+        processing_duration = time.time() - start_time
+        self.processing_times.append(processing_duration)
+        rate = self.calculate_rate()
+        cumulative_count = len(self.cumulative_points)
+        # Save metrics
+
+        # Write to CSV
+        self.csv_writer.writerow([
+            now,
+            pc_time,
+            latency,
+            processing_duration,
+            rate,
+            cumulative_count
+        ])
 
     @staticmethod
     def odometry_callback(msg):
@@ -147,4 +195,12 @@ class PointCloudTransformer:
 if __name__ == "__main__":
     rospy.init_node('point_cloud_transformer')
     transformer = PointCloudTransformer()
+
+
+    def shutdown_hook():
+        rospy.loginfo("Shutting down, closing CSV file.")
+        transformer.csv_file.close()
+
+
+    rospy.on_shutdown(shutdown_hook)
     rospy.spin()
