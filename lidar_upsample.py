@@ -22,7 +22,8 @@ class PointCloudTransformer:
     def __init__(self):
         # Create a unique log file name with timestamp
         self.processing_times = deque(maxlen=100)
-        self.timestamps = deque(maxlen=100)
+        self.input_timestamps = deque(maxlen=100)
+        self.processed_timestamps = deque(maxlen=100)
         self.message_count = 0
         self.last_msg_time = None
 
@@ -40,7 +41,7 @@ class PointCloudTransformer:
 
         # Write the CSV header
         self.csv_writer.writerow(
-            ["ros_time", "pc_timestamp", "latency_sec", "processing_time_sec", "message_rate_Hz", "cumulative_points"])
+            ["ros_time", "pc_timestamp", "latency_sec", "processing_time_sec", "processing_rate_Hz", "input_rate_Hz", "throughput_ratio", "cumulative_points"])
 
         # Initialize a list to store cumulative transformed points
         self.cumulative_points = []
@@ -66,13 +67,14 @@ class PointCloudTransformer:
         self.cumulative_cloud_pub = rospy.Publisher('/cumulative_point_cloud', PointCloud2, queue_size=10)
         self.odom_pub = rospy.Publisher('/transformed_odom', Odometry, queue_size=10)
 
-    def calculate_rate(self):
-        if len(self.timestamps) < 2:
+    def calculate_rate(self, timestamps):
+        if len(timestamps) < 2:
             return 0.0
-        duration = self.timestamps[-1] - self.timestamps[0]
-        return len(self.timestamps) / duration if duration > 0 else 0.0
+        duration = timestamps[-1] - timestamps[0]
+        return len(timestamps) / duration if duration > 0 else 0.0
 
     def synced_callback(self, point_cloud_msg, odom_msg):
+        self.input_timestamps.append(rospy.Time.now().to_sec())
         try:
             self.msg_queue.put_nowait((point_cloud_msg, odom_msg))
         except queue.Full:
@@ -90,18 +92,21 @@ class PointCloudTransformer:
                 now = rospy.Time.now().to_sec()
                 latency = now - pc_time
 
-                self.timestamps.append(pc_time)
+                self.processed_timestamps.append(pc_time)
                 self.message_count += 1
 
                 translation, rotation, transformed_odom_msg = self.odometry_callback(odom_msg)
                 self.point_cloud_callback(point_cloud_msg, translation, rotation)
                 self.odom_pub.publish(transformed_odom_msg)
 
+                # Save metrics
                 processing_duration = time.time() - start_time
                 self.processing_times.append(processing_duration)
-                rate = self.calculate_rate()
                 cumulative_count = len(self.cumulative_points)
-                # Save metrics
+
+                processing_rate = self.calculate_rate(self.processed_timestamps)
+                input_rate = self.calculate_rate(self.input_timestamps)
+                throughput_ratio = processing_rate / input_rate if input_rate > 0 else 0
 
                 # Write to CSV
                 self.csv_writer.writerow([
@@ -109,7 +114,9 @@ class PointCloudTransformer:
                     pc_time,
                     latency,
                     processing_duration,
-                    rate,
+                    processing_rate,
+                    input_rate,
+                    throughput_ratio,
                     cumulative_count
                 ])
             except queue.Empty:
