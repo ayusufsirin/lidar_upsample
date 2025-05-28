@@ -14,6 +14,9 @@ import tf.transformations as transformations
 from nav_msgs.msg import Odometry
 from sensor_msgs.msg import PointCloud2
 
+import threading
+import queue
+
 
 class PointCloudTransformer:
     def __init__(self):
@@ -42,6 +45,14 @@ class PointCloudTransformer:
         # Initialize a list to store cumulative transformed points
         self.cumulative_points = []
 
+        # Threading queue
+        self.msg_queue = queue.Queue(maxsize=100)
+        self.shutdown_flag = threading.Event()
+
+        # Start the processing thread
+        self.worker_thread = threading.Thread(target=self.processing_loop, daemon=True)
+        self.worker_thread.start()
+
         # Initialize subscribers
         pc_sub = message_filters.Subscriber('/islam/vlp_pts', PointCloud2)
         odom_sub = message_filters.Subscriber('/islam/vlp_odom', Odometry)
@@ -62,35 +73,47 @@ class PointCloudTransformer:
         return len(self.timestamps) / duration if duration > 0 else 0.0
 
     def synced_callback(self, point_cloud_msg, odom_msg):
-        start_time = time.time()
+        try:
+            self.msg_queue.put_nowait((point_cloud_msg, odom_msg))
+        except queue.Full:
+            rospy.logwarn("Processing queue full — dropping frame.")
 
-        # Latency
-        pc_time = point_cloud_msg.header.stamp.to_sec()
-        now = rospy.Time.now().to_sec()
-        latency = now - pc_time
+    def processing_loop(self):
+        while not self.shutdown_flag.is_set() and not rospy.is_shutdown():
+            try:
+                point_cloud_msg, odom_msg = self.msg_queue.get(timeout=0.1)
 
-        self.timestamps.append(pc_time)
-        self.message_count += 1
+                start_time = time.time()
 
-        translation, rotation, transformed_odom_msg = self.odometry_callback(odom_msg)
-        self.point_cloud_callback(point_cloud_msg, translation, rotation)
-        self.odom_pub.publish(transformed_odom_msg)
+                # Latency
+                pc_time = point_cloud_msg.header.stamp.to_sec()
+                now = rospy.Time.now().to_sec()
+                latency = now - pc_time
 
-        processing_duration = time.time() - start_time
-        self.processing_times.append(processing_duration)
-        rate = self.calculate_rate()
-        cumulative_count = len(self.cumulative_points)
-        # Save metrics
+                self.timestamps.append(pc_time)
+                self.message_count += 1
 
-        # Write to CSV
-        self.csv_writer.writerow([
-            now,
-            pc_time,
-            latency,
-            processing_duration,
-            rate,
-            cumulative_count
-        ])
+                translation, rotation, transformed_odom_msg = self.odometry_callback(odom_msg)
+                self.point_cloud_callback(point_cloud_msg, translation, rotation)
+                self.odom_pub.publish(transformed_odom_msg)
+
+                processing_duration = time.time() - start_time
+                self.processing_times.append(processing_duration)
+                rate = self.calculate_rate()
+                cumulative_count = len(self.cumulative_points)
+                # Save metrics
+
+                # Write to CSV
+                self.csv_writer.writerow([
+                    now,
+                    pc_time,
+                    latency,
+                    processing_duration,
+                    rate,
+                    cumulative_count
+                ])
+            except queue.Empty:
+                continue
 
     @staticmethod
     def odometry_callback(msg):
@@ -199,6 +222,8 @@ if __name__ == "__main__":
 
     def shutdown_hook():
         rospy.loginfo("Shutting down, closing CSV file.")
+        transformer.shutdown_flag.set()
+        transformer.worker_thread.join()
         transformer.csv_file.close()
 
 
