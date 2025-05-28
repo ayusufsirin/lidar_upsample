@@ -202,24 +202,26 @@ class PointCloudTransformer:
         self.cumulative_cloud_pub.publish(cumulative_msg)
 
     def transform_point_cloud(self, point_cloud, translation, rotation):
-        # Create a rotation matrix from the quaternion
-        rotation_matrix = transformations.quaternion_matrix(rotation)
+        # Convert input list to a (N, 3) NumPy array
+        pc_np = np.array(point_cloud)  # shape: (N, 3)
 
-        # Apply rotation and translation to each point
-        transformed_points = []
-        for point in point_cloud:
-            # Convert point to homogeneous coordinates
-            point_h = np.array([point[0], point[1], point[2], 1.0])
+        if pc_np.shape[0] == 0:
+            return []
 
-            # Apply rotation
-            rotated_point_h = np.dot(rotation_matrix, point_h)
+        # Add homogeneous column (1s)
+        ones = np.ones((pc_np.shape[0], 1))
+        pc_homogeneous = np.hstack((pc_np, ones))  # shape: (N, 4)
 
-            # Apply translation
-            translated_point = rotated_point_h[:3] + np.array(translation)
+        # Rotation matrix from quaternion
+        rotation_matrix = transformations.quaternion_matrix(rotation)  # shape: (4, 4)
 
-            transformed_points.append(translated_point)
+        # Apply transformation to all points at once
+        transformed_h = pc_homogeneous @ rotation_matrix.T  # shape: (N, 4)
 
-        return transformed_points
+        # Apply translation
+        translated = transformed_h[:, :3] + np.array(translation)  # shape: (N, 3)
+
+        return translated
 
 
 if __name__ == "__main__":
