@@ -1,5 +1,7 @@
 # LIDAR Upsample
 
+![cumulative-rviz.png](assets/cumulative-rviz.png)
+
 Current dependencies:
 
 - ROS Noetic

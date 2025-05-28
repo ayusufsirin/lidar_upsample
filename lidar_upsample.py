@@ -1,34 +1,53 @@
 #!/usr/bin/env python
 
+import message_filters
+import numpy as np
 import rospy
-from sensor_msgs.msg import PointCloud2
-from nav_msgs.msg import Odometry
 import sensor_msgs.point_cloud2 as pc2
 import tf.transformations as transformations
-import numpy as np
+from nav_msgs.msg import Odometry
+from sensor_msgs.msg import PointCloud2
 
 
 class PointCloudTransformer:
     def __init__(self):
-        # Initialize variables to store odometry data
-        self.translation = None
-        self.rotation = None
-
         # Initialize a list to store cumulative transformed points
         self.cumulative_points = []
 
         # Initialize subscribers
-        rospy.Subscriber('/islam/vlp_pts', PointCloud2, self.point_cloud_callback)
-        rospy.Subscriber('/islam/vlp_odom', Odometry, self.odometry_callback)
+        pc_sub = message_filters.Subscriber('/islam/vlp_pts', PointCloud2)
+        odom_sub = message_filters.Subscriber('/islam/vlp_odom', Odometry)
+
+        # ApproximateTime synchronizer
+        ts = message_filters.ApproximateTimeSynchronizer([pc_sub, odom_sub], queue_size=10, slop=0.1)
+        ts.registerCallback(self.synced_callback)
 
         # Initialize publishers
         self.point_cloud_pub = rospy.Publisher('/transformed_point_cloud', PointCloud2, queue_size=10)
         self.cumulative_cloud_pub = rospy.Publisher('/cumulative_point_cloud', PointCloud2, queue_size=10)
         self.odom_pub = rospy.Publisher('/transformed_odom', Odometry, queue_size=10)
 
-    def odometry_callback(self, msg):
+    def synced_callback(self, point_cloud_msg, odom_msg):
+        # rospy.loginfo("Synced callback")
+        # rospy.loginfo(
+        #     f"point_cloud_msg: {point_cloud_msg.header.stamp.secs}.{point_cloud_msg.header.stamp.nsecs}, "
+        #     f"odom_msg: {odom_msg.header.stamp.secs}.{odom_msg.header.stamp.nsecs}"
+        # )
+        # rospy.loginfo(
+        #     f"point_cloud_msg: {point_cloud_msg}, "
+        #     f"odom_msg: {odom_msg}"
+        # )
+
+        translation, rotation, transformed_odom_msg = self.odometry_callback(odom_msg)
+        self.point_cloud_callback(point_cloud_msg, translation, rotation)
+
+        # Publish the transformed odometry message
+        self.odom_pub.publish(transformed_odom_msg)
+
+    @staticmethod
+    def odometry_callback(msg):
         # Extract translation and rotation from the odometry message
-        self.translation = [
+        translation = [
             - msg.pose.pose.position.x,
             msg.pose.pose.position.z,
             0,  # msg.pose.pose.position.y,
@@ -52,7 +71,7 @@ class PointCloudTransformer:
         combined_rotation_matrix = np.dot(rot_z, np.dot(rot_y, np.dot(rot_x, original_rotation_matrix)))
 
         # Convert the combined rotation matrix back to a quaternion
-        self.rotation = transformations.quaternion_from_matrix(combined_rotation_matrix)
+        rotation = transformations.quaternion_from_matrix(combined_rotation_matrix)
 
         # Create and publish the transformed odometry message
         transformed_odom_msg = Odometry()
@@ -60,23 +79,22 @@ class PointCloudTransformer:
         transformed_odom_msg.child_frame_id = msg.child_frame_id
 
         # Set the transformed pose in the odometry message
-        transformed_odom_msg.pose.pose.position.x = self.translation[0]
-        transformed_odom_msg.pose.pose.position.y = self.translation[1]
-        transformed_odom_msg.pose.pose.position.z = self.translation[2]
+        transformed_odom_msg.pose.pose.position.x = translation[0]
+        transformed_odom_msg.pose.pose.position.y = translation[1]
+        transformed_odom_msg.pose.pose.position.z = translation[2]
 
-        transformed_odom_msg.pose.pose.orientation.x = self.rotation[0]
-        transformed_odom_msg.pose.pose.orientation.y = self.rotation[1]
-        transformed_odom_msg.pose.pose.orientation.z = self.rotation[2]
-        transformed_odom_msg.pose.pose.orientation.w = self.rotation[3]
+        transformed_odom_msg.pose.pose.orientation.x = rotation[0]
+        transformed_odom_msg.pose.pose.orientation.y = rotation[1]
+        transformed_odom_msg.pose.pose.orientation.z = rotation[2]
+        transformed_odom_msg.pose.pose.orientation.w = rotation[3]
 
         # Copy the twist part from the original odometry message
         transformed_odom_msg.twist = msg.twist
 
-        # Publish the transformed odometry message
-        self.odom_pub.publish(transformed_odom_msg)
+        return translation, rotation, transformed_odom_msg
 
-    def point_cloud_callback(self, point_cloud_msg):
-        if self.translation is None or self.rotation is None:
+    def point_cloud_callback(self, point_cloud_msg, translation, rotation):
+        if translation is None or rotation is None:
             rospy.logwarn("Odometry data not yet available, skipping point cloud transformation.")
             return
 
@@ -84,7 +102,7 @@ class PointCloudTransformer:
         point_list = list(pc2.read_points(point_cloud_msg, skip_nans=True, field_names=("x", "y", "z")))
 
         # Transform the point cloud using odometry data
-        transformed_points = self.transform_point_cloud(point_list, self.translation, self.rotation)
+        transformed_points = self.transform_point_cloud(point_list, translation, rotation)
 
         # Add additional fields from the original point cloud
         new_points = []
