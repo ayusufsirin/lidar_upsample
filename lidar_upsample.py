@@ -7,11 +7,15 @@ import sensor_msgs.point_cloud2 as pc2
 import tf.transformations as transformations
 import numpy as np
 
+
 class PointCloudTransformer:
     def __init__(self):
         # Initialize variables to store odometry data
         self.translation = None
         self.rotation = None
+
+        # Initialize a list to store cumulative transformed points
+        self.cumulative_points = []
 
         # Initialize subscribers
         rospy.Subscriber('/islam/vlp_pts', PointCloud2, self.point_cloud_callback)
@@ -19,22 +23,23 @@ class PointCloudTransformer:
 
         # Initialize publishers
         self.point_cloud_pub = rospy.Publisher('/transformed_point_cloud', PointCloud2, queue_size=10)
+        self.cumulative_cloud_pub = rospy.Publisher('/cumulative_point_cloud', PointCloud2, queue_size=10)
         self.odom_pub = rospy.Publisher('/transformed_odom', Odometry, queue_size=10)
 
     def odometry_callback(self, msg):
         # Extract translation and rotation from the odometry message
         self.translation = [
-            - msg.pose.pose.position.x, 
-            msg.pose.pose.position.z, 
-            0, # msg.pose.pose.position.y,
+            - msg.pose.pose.position.x,
+            msg.pose.pose.position.z,
+            0,  # msg.pose.pose.position.y,
         ]
         original_rotation = [
-            0, # msg.pose.pose.orientation.x,
-            0, # msg.pose.pose.orientation.z,
+            0,  # msg.pose.pose.orientation.x,
+            0,  # msg.pose.pose.orientation.z,
             msg.pose.pose.orientation.y,
             msg.pose.pose.orientation.w
         ]
-                
+
         # Convert the quaternion to a rotation matrix
         original_rotation_matrix = transformations.quaternion_matrix(original_rotation)
 
@@ -48,7 +53,7 @@ class PointCloudTransformer:
 
         # Convert the combined rotation matrix back to a quaternion
         self.rotation = transformations.quaternion_from_matrix(combined_rotation_matrix)
-        
+
         # Create and publish the transformed odometry message
         transformed_odom_msg = Odometry()
         transformed_odom_msg.header = msg.header
@@ -93,6 +98,13 @@ class PointCloudTransformer:
         # Publish the transformed point cloud
         self.point_cloud_pub.publish(transformed_msg)
 
+        # Add the new points to the cumulative point cloud
+        self.cumulative_points.extend(new_points)
+
+        # Create and publish the cumulative PointCloud2 message
+        cumulative_msg = pc2.create_cloud(point_cloud_msg.header, point_cloud_msg.fields, self.cumulative_points)
+        self.cumulative_cloud_pub.publish(cumulative_msg)
+
     def transform_point_cloud(self, point_cloud, translation, rotation):
         # Create a rotation matrix from the quaternion
         rotation_matrix = transformations.quaternion_matrix(rotation)
@@ -112,6 +124,7 @@ class PointCloudTransformer:
             transformed_points.append(translated_point)
 
         return transformed_points
+
 
 if __name__ == "__main__":
     rospy.init_node('point_cloud_transformer')
