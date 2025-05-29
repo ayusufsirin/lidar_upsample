@@ -2,6 +2,8 @@
 
 import csv
 import os
+import queue
+import threading
 import time
 from collections import deque
 from datetime import datetime
@@ -14,8 +16,7 @@ import tf.transformations as transformations
 from nav_msgs.msg import Odometry
 from sensor_msgs.msg import PointCloud2
 
-import threading
-import queue
+VLP_HISTORY_SIZE = 10
 
 
 class PointCloudTransformer:
@@ -41,7 +42,8 @@ class PointCloudTransformer:
 
         # Write the CSV header
         self.csv_writer.writerow(
-            ["ros_time", "pc_timestamp", "latency_sec", "processing_time_sec", "processing_rate_Hz", "input_rate_Hz", "throughput_ratio", "cumulative_points"])
+            ["ros_time", "pc_timestamp", "latency_sec", "processing_time_sec", "processing_rate_Hz", "input_rate_Hz",
+             "throughput_ratio", "cumulative_points"])
 
         # Initialize a list to store cumulative transformed points
         self.cumulative_points = []
@@ -102,7 +104,7 @@ class PointCloudTransformer:
                 # Save metrics
                 processing_duration = time.time() - start_time
                 self.processing_times.append(processing_duration)
-                cumulative_count = len(self.cumulative_points)
+                cumulative_count = 1 # len(self.cumulative_points)
 
                 processing_rate = self.calculate_rate(self.processed_timestamps)
                 input_rate = self.calculate_rate(self.input_timestamps)
@@ -195,10 +197,24 @@ class PointCloudTransformer:
         self.point_cloud_pub.publish(transformed_msg)
 
         # Add the new points to the cumulative point cloud
-        self.cumulative_points.extend(new_points)
+        self.cumulative_points.append(new_points)
+
+        points = []
+
+        for a in self.cumulative_points[-VLP_HISTORY_SIZE:]:
+            points.extend(a)
 
         # Create and publish the cumulative PointCloud2 message
-        cumulative_msg = pc2.create_cloud(point_cloud_msg.header, point_cloud_msg.fields, self.cumulative_points)
+        cumulative_msg = pc2.create_cloud(
+            point_cloud_msg.header,
+            point_cloud_msg.fields,
+            # self.cumulative_points,
+            points
+        )
+
+        # rospy.loginfo(len(self.cumulative_points))
+        # rospy.loginfo(len(self.cumulative_points[-VLP_HISTORY_SIZE:]))
+
         self.cumulative_cloud_pub.publish(cumulative_msg)
 
     def transform_point_cloud(self, point_cloud, translation, rotation):
