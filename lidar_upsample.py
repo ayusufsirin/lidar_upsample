@@ -16,7 +16,9 @@ import tf.transformations as transformations
 from nav_msgs.msg import Odometry
 from sensor_msgs.msg import PointCloud2
 
-VLP_HISTORY_SIZE = 10
+PC_HISTORY_SIZE = 10
+PC_TOPIC = '/islam/vlp_pts'
+ODOM_TOPIC = '/islam/vlp_odom'
 
 
 class PointCloudTransformer:
@@ -57,8 +59,8 @@ class PointCloudTransformer:
         self.worker_thread.start()
 
         # Initialize subscribers
-        pc_sub = message_filters.Subscriber('/islam/vlp_pts', PointCloud2)
-        odom_sub = message_filters.Subscriber('/islam/vlp_odom', Odometry)
+        pc_sub = message_filters.Subscriber(PC_TOPIC, PointCloud2)
+        odom_sub = message_filters.Subscriber(ODOM_TOPIC, Odometry)
 
         # ApproximateTime synchronizer
         ts = message_filters.ApproximateTimeSynchronizer([pc_sub, odom_sub], queue_size=10, slop=0.1)
@@ -201,7 +203,7 @@ class PointCloudTransformer:
 
         points = []
 
-        for a in self.cumulative_points[-VLP_HISTORY_SIZE:]:
+        for a in self.cumulative_points[-PC_HISTORY_SIZE:]:
             points.extend(a)
 
         # Create and publish the cumulative PointCloud2 message
