@@ -19,22 +19,42 @@ Current dependencies:
 docker compose up
 ```
 
-```bash
-source /opt/ros/noetic/setup.bash
-rosbag play /home/joseph/Development/DS/2023-05-08-20-25-52.bag -l
-rosbag play /home/joseph/Development/DS/2023-05-08-20-25-52.bag -l -s 55 --rate 0.1
-```
+### SensorSuiteV2 Dataset
 
 ```bash
 source /opt/ros/noetic/setup.bash
-rviz -d /media/joseph/Development/GitHub/lidar_upsample/rviz.rviz
+rosbag play /home/joseph/Development/DS/2023-05-08-20-25-52.bag -l
 ```
+
+```bash
+rosbag play /home/joseph/Development/DS/2023-05-08-20-25-52.bag -l -s 55 --rate 1.0
+```
+
+### CitrusFarm Dataset
+
+```bash
+rosbag play -l -s 10 -u 10 \
+~/Development/DS/Citrus-Farm-Dataset/01_13B_Jackal/base_2023-07-18-14-26-48_0.bag \
+~/Development/DS/Citrus-Farm-Dataset/01_13B_Jackal/zed_2023-07-18-14-26-49_0.bag \
+~/Development/DS/Citrus-Farm-Dataset/01_13B_Jackal/odom_2023-07-18-14-26-48.bag
+```
+
+## Run Topic Transformer
 
 ```bash
 ./transformer_lidar.sh
 ```
 
+## Run Algorithm
+
 ```bash
 source /opt/ros/noetic/setup.bash
 python3 /media/joseph/Development/GitHub/lidar_upsample/lidar_upsample.py
+```
+
+## RViz
+
+```bash
+source /opt/ros/noetic/setup.bash
+rviz -d /media/joseph/Development/GitHub/lidar_upsample/rviz.rviz
 ```
