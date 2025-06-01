@@ -15,6 +15,8 @@ import sensor_msgs.point_cloud2 as pc2
 import tf.transformations as transformations
 from nav_msgs.msg import Odometry
 from sensor_msgs.msg import PointCloud2
+from collections import deque
+
 
 PC_HISTORY_SIZE = 10
 PC_TOPIC = '/islam/vlp_pts'
@@ -47,10 +49,10 @@ class PointCloudTransformer:
             ["ros_time", "pc_timestamp", "latency_sec", "processing_time_sec", "processing_rate_Hz", "input_rate_Hz",
              "throughput_ratio", "cumulative_points"])
 
-        # Initialize a list to store cumulative transformed points
-        self.cumulative_points = []
-        # Initialize a list to store cumulative origin-translated points
-        self.cumulative_origin_points = []
+        # Initialize deques to store cumulative transformed points with a maximum length
+        # This prevents unbounded memory growth by keeping only the most recent PC_HISTORY_SIZE point clouds.
+        self.cumulative_points = deque(maxlen=PC_HISTORY_SIZE)
+        self.cumulative_origin_points = deque(maxlen=PC_HISTORY_SIZE)
 
 
         # Threading queue
@@ -110,7 +112,7 @@ class PointCloudTransformer:
                 # Save metrics
                 processing_duration = time.time() - start_time
                 self.processing_times.append(processing_duration)
-                cumulative_count = 1 # len(self.cumulative_points)
+                cumulative_count = len(self.cumulative_points)
 
                 processing_rate = self.calculate_rate(self.processed_timestamps)
                 input_rate = self.calculate_rate(self.input_timestamps)
@@ -202,10 +204,9 @@ class PointCloudTransformer:
 
         self.cumulative_origin_points.append(origin_translated_points)
 
-
         points_cumulative_transformed = []
-        for a in self.cumulative_points[-PC_HISTORY_SIZE:]:
-            points_cumulative_transformed.extend(a)
+        for frame_points in self.cumulative_points:
+            points_cumulative_transformed.extend(frame_points)
 
         # Create and publish the cumulative PointCloud2 message (transformed to global frame)
         cumulative_msg = pc2.create_cloud(
@@ -219,8 +220,8 @@ class PointCloudTransformer:
 
         # Prepare points for the origin-aligned cumulative cloud
         points_cumulative_origin = []
-        for a in self.cumulative_origin_points[-PC_HISTORY_SIZE:]:
-            points_cumulative_origin.extend(a)
+        for frame_points in self.cumulative_origin_points:
+            points_cumulative_origin.extend(frame_points)
 
         # Create and publish the origin-aligned cumulative PointCloud2 message
         cumulative_origin_msg = pc2.create_cloud(
