@@ -49,7 +49,12 @@ rosbag play -l -s 10 -u 10 \
 
 ```bash
 source /opt/ros/noetic/setup.bash
-python3 /media/joseph/Development/GitHub/lidar_upsample/lidar_upsample.py
+python3 lidar_upsample.py
+```
+
+```bash
+source /opt/ros/noetic/setup.bash
+python3 meas_topic_stats.py
 ```
 
 ## RViz
