@@ -68,7 +68,8 @@ python3 meas_topic_stats.py
 ```
 
 ```bash
-python3 /home/joseph/PycharmProjects/citrusFarmSFITC/main.py
+cd /home/joseph/PycharmProjects/citrusFarmSFITC/
+python3 main.py
 ```
 
 ## RViz
