@@ -57,6 +57,10 @@ source /opt/ros/noetic/setup.bash
 python3 meas_topic_stats.py
 ```
 
+```bash
+python3 /home/joseph/PycharmProjects/citrusFarmSFITC/main.py
+```
+
 ## RViz
 
 ```bash
