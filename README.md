@@ -39,6 +39,16 @@ rosbag play -l -s 10 -u 10 \
 ~/Development/DS/Citrus-Farm-Dataset/01_13B_Jackal/odom_2023-07-18-14-26-48.bag
 ```
 
+> :warning: To make all the topics synchronized, we have to make the reply rate 0.1 (etc.). Otherwise, there will be
+> delay between some topics.
+
+```bash
+rosbag play -l -s 10 -u 10 -r 0.1 \
+~/Development/DS/Citrus-Farm-Dataset/01_13B_Jackal/base_2023-07-18-14-26-48_0.bag \
+~/Development/DS/Citrus-Farm-Dataset/01_13B_Jackal/zed_2023-07-18-14-26-49_0.bag \
+~/Development/DS/Citrus-Farm-Dataset/01_13B_Jackal/odom_2023-07-18-14-26-48.bag
+```
+
 ## Run Topic Transformer
 
 ```bash
