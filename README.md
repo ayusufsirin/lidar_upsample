@@ -10,6 +10,15 @@ Current dependencies:
 
 ## Bags
 
+The bag files are collected from two different datasets with similar ROS topics. One of them is CitrusFarm and
+the other one is SensorSuiteV2 dataset.
+
+```mermaid\
+graph TD
+    Datasets ---> CitrusFarmDataset;
+    Datasets ---> SensorSuiteV2Dataset;
+```
+
 - [2024-10-01-19-26-26.bag](../../DS/2024-10-01-19-26-26.bag)
 - [2023-05-08-20-25-52.bag](../../DS/2023-05-08-20-25-52.bag)
 
