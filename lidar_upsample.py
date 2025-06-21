@@ -15,12 +15,14 @@ import sensor_msgs.point_cloud2 as pc2
 import tf.transformations as transformations
 from nav_msgs.msg import Odometry
 from sensor_msgs.msg import PointCloud2
-from collections import deque
-
 
 PC_HISTORY_SIZE = 10
 PC_TOPIC = '/islam/vlp_pts'
 ODOM_TOPIC = '/islam/vlp_odom'
+
+TRANSFORMED_POINT_CLOUD = '/transformed_point_cloud'
+CUMULATIVE_POINT_CLOUD = '/cumulative_point_cloud'
+CUMULATIVE_ORIGIN_POINT_CLOUD = '/cumulative_origin_point_cloud'
 
 
 class PointCloudTransformer:
@@ -45,15 +47,22 @@ class PointCloudTransformer:
         self.csv_writer = csv.writer(self.csv_file)
 
         # Write the CSV header
-        self.csv_writer.writerow(
-            ["ros_time", "pc_timestamp", "latency_sec", "processing_time_sec", "processing_rate_Hz", "input_rate_Hz",
-             "throughput_ratio", "cumulative_points"])
+        self.csv_writer.writerow([
+            "ros_time",
+            "pc_timestamp",
+            "latency_sec",
+            "processing_time_sec",
+            "processing_rate_Hz",
+            "input_rate_Hz",
+            "throughput_ratio",
+            "cumulative_points",
+            "input_queue_size"
+        ])
 
         # Initialize deques to store cumulative transformed points with a maximum length
         # This prevents unbounded memory growth by keeping only the most recent PC_HISTORY_SIZE point clouds.
         self.cumulative_points = deque(maxlen=PC_HISTORY_SIZE)
         self.cumulative_origin_points = deque(maxlen=PC_HISTORY_SIZE)
-
 
         # Threading queue
         self.msg_queue = queue.Queue(maxsize=100)
@@ -72,9 +81,10 @@ class PointCloudTransformer:
         ts.registerCallback(self.synced_callback)
 
         # Initialize publishers
-        self.point_cloud_pub = rospy.Publisher('/transformed_point_cloud', PointCloud2, queue_size=10)
-        self.cumulative_cloud_pub = rospy.Publisher('/cumulative_point_cloud', PointCloud2, queue_size=10)
-        self.cumulative_origin_cloud_pub = rospy.Publisher('/cumulative_origin_point_cloud', PointCloud2, queue_size=10) # NEW PUBLISHER
+        self.point_cloud_pub = rospy.Publisher(TRANSFORMED_POINT_CLOUD, PointCloud2, queue_size=10)
+        self.cumulative_cloud_pub = rospy.Publisher(CUMULATIVE_POINT_CLOUD, PointCloud2, queue_size=10)
+        self.cumulative_origin_cloud_pub = rospy.Publisher(CUMULATIVE_ORIGIN_POINT_CLOUD, PointCloud2,
+                                                           queue_size=10)  # NEW PUBLISHER
         self.odom_pub = rospy.Publisher('/transformed_odom', Odometry, queue_size=10)
 
     def calculate_rate(self, timestamps):
@@ -127,7 +137,8 @@ class PointCloudTransformer:
                     processing_rate,
                     input_rate,
                     throughput_ratio,
-                    cumulative_count
+                    cumulative_count,
+                    self.msg_queue.qsize()  # approx.
                 ])
             except queue.Empty:
                 continue
@@ -231,7 +242,6 @@ class PointCloudTransformer:
         )
         rospy.loginfo("Publish cumulative origin PC")
         self.cumulative_origin_cloud_pub.publish(cumulative_origin_msg)
-
 
     def transform_point_cloud(self, point_cloud, translation, rotation):
         # Convert input list to a (N, 3) NumPy array
