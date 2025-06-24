@@ -15,4 +15,10 @@ bkz. [topic_stats_20250619_230104_ten2one_rate.csv](./logs/topic_stats_20250619_
 
 Yeni profiler'lar cıtrusFarm `main.py` dosyasına eklendi. Bu sayede darboğazın `msg2pts` fonksiyonunda olduğu anlaşıldı.
 Bu fonksiyon GPU'da çalışmaya daha uygun hale getirildi. Toplam işlem gecikmesi ~18 ms civalarına kadar düşürüldü (
-nihayi fusion süresi için değil). 
+nihayi fusion süresi için değil).
+
+# 23.06.2025
+
+Depth imajlari PC haline getiren fonksiyonlar tekrar aktive edildi ve profiler'lar bunlar için de eklendi. Anlaşıldığı
+üzere `pc_msg = pc2.create_cloud(header, fields, cart_pts_np)` kod bloğunun işlenmesi bir darboğaz oluşturuyor.
+Burasının otimize edilmesi gerektiğine karar verildi.
