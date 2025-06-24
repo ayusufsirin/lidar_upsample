@@ -22,3 +22,8 @@ nihayi fusion süresi için değil).
 Depth imajlari PC haline getiren fonksiyonlar tekrar aktive edildi ve profiler'lar bunlar için de eklendi. Anlaşıldığı
 üzere `pc_msg = pc2.create_cloud(header, fields, cart_pts_np)` kod bloğunun işlenmesi bir darboğaz oluşturuyor.
 Burasının otimize edilmesi gerektiğine karar verildi.
+
+# 24.06.2025
+
+Daha önceden darboğaza sebep olduğu tespit edilen `pc2.create_cloud` fonksiyonu yenisiyle (`create_cloud_from_np`)
+değiştirildi.
