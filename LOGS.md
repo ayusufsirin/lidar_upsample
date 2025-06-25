@@ -27,3 +27,8 @@ Burasının otimize edilmesi gerektiğine karar verildi.
 
 Daha önceden darboğaza sebep olduğu tespit edilen `pc2.create_cloud` fonksiyonu yenisiyle (`create_cloud_from_np`)
 değiştirildi.
+
+# 25.06.2025
+
+`lidar_upsample.py` koduna yönlendim ve buradaki takılma ve gecikme sorunlarına el atmaya başladım. ~500 ms olan gecikme
+değerini düşürmek için önce profiling işlemlerini ekliyorum.  

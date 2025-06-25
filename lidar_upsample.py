@@ -50,8 +50,10 @@ class PointCloudTransformer:
         self.csv_writer.writerow([
             "ros_time",
             "pc_timestamp",
-            "latency_sec",
-            "processing_time_sec",
+            "latency_ms",
+            "processing_time_ms",
+            'odom_callback_duration_ms',
+            'pc_callback_duration_ms'
             "processing_rate_Hz",
             "input_rate_Hz",
             "throughput_ratio",
@@ -110,18 +112,24 @@ class PointCloudTransformer:
                 # Latency
                 pc_time = point_cloud_msg.header.stamp.to_sec()
                 now = rospy.Time.now().to_sec()
-                latency = now - pc_time
+                latency_ms = (now - pc_time) * 1000.0
 
                 self.processed_timestamps.append(pc_time)
                 self.message_count += 1
 
+                odom_callback_start_time = time.time()
                 translation, rotation, transformed_odom_msg = self.odometry_callback(odom_msg)
+                odom_callback_duration_ms = (time.time() - odom_callback_start_time) * 1000.0
+
+                pc_callback_start_time = time.time()
                 self.point_cloud_callback(point_cloud_msg, translation, rotation)
+                pc_callback_duration_ms = (time.time() - pc_callback_start_time) * 1000.0
+
                 self.odom_pub.publish(transformed_odom_msg)
 
                 # Save metrics
-                processing_duration = time.time() - start_time
-                self.processing_times.append(processing_duration)
+                processing_duration_ms = (time.time() - start_time) * 1000.0
+                self.processing_times.append(processing_duration_ms)
                 cumulative_count = len(self.cumulative_points)
 
                 processing_rate = self.calculate_rate(self.processed_timestamps)
@@ -132,8 +140,10 @@ class PointCloudTransformer:
                 self.csv_writer.writerow([
                     now,
                     pc_time,
-                    latency,
-                    processing_duration,
+                    latency_ms,
+                    processing_duration_ms,
+                    odom_callback_duration_ms,
+                    pc_callback_duration_ms,
                     processing_rate,
                     input_rate,
                     throughput_ratio,
