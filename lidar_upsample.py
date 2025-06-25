@@ -53,7 +53,13 @@ class PointCloudTransformer:
             "latency_ms",
             "processing_time_ms",
             'odom_callback_duration_ms',
-            'pc_callback_duration_ms'
+            'pc_callback_duration_ms',
+            'pc_to_points_duration_ms',
+            'transform_points_duration_ms',
+            'pc_create_duration_ms',
+            'cumulative_points_duration_ms',
+            'translate_points_duration_ms',
+            'cumulative_origin_points_duration_ms,',
             "processing_rate_Hz",
             "input_rate_Hz",
             "throughput_ratio",
@@ -122,7 +128,7 @@ class PointCloudTransformer:
                 odom_callback_duration_ms = (time.time() - odom_callback_start_time) * 1000.0
 
                 pc_callback_start_time = time.time()
-                self.point_cloud_callback(point_cloud_msg, translation, rotation)
+                pc_callback_stats = self.point_cloud_callback(point_cloud_msg, translation, rotation)
                 pc_callback_duration_ms = (time.time() - pc_callback_start_time) * 1000.0
 
                 self.odom_pub.publish(transformed_odom_msg)
@@ -144,6 +150,7 @@ class PointCloudTransformer:
                     processing_duration_ms,
                     odom_callback_duration_ms,
                     pc_callback_duration_ms,
+                    *pc_callback_stats.values(),
                     processing_rate,
                     input_rate,
                     throughput_ratio,
@@ -193,11 +200,16 @@ class PointCloudTransformer:
             rospy.logwarn("Odometry data not yet available, skipping point cloud transformation.")
             return
 
-        # Convert the PointCloud2 message to a list of points
+        # %% Convert the PointCloud2 message to a list of points
+        pc_to_points_start_time = time.time()
         point_list = list(pc2.read_points(point_cloud_msg, skip_nans=True, field_names=("x", "y", "z")))
+        pc_to_points_duration_ms = (time.time() - pc_to_points_start_time) * 1000.0
 
+        # %% Transform PC
+        transform_points_start_time = time.time()
         # Transform the point cloud using odometry data
         transformed_points = self.transform_point_cloud(point_list, translation, rotation)
+        transform_points_duration_ms = (time.time() - transform_points_start_time) * 1000.0
 
         # Add additional fields from the original point cloud
         new_points = []
@@ -205,25 +217,20 @@ class PointCloudTransformer:
             new_point = list(transformed_points[i]) + list(original_point[3:])
             new_points.append(new_point)
 
+        # %% Transformed PC message
         # Create a new PointCloud2 message with the transformed points
+        pc_create_start_time = time.time()
         transformed_msg = pc2.create_cloud(point_cloud_msg.header, point_cloud_msg.fields, new_points)
+        pc_create_duration_ms = (time.time() - pc_create_start_time) * 1000.0
 
         # Publish the transformed point cloud
         self.point_cloud_pub.publish(transformed_msg)
 
+        # %% Cumulative points
+        cumulative_points_start_time = time.time()
+
         # Add the new points to the cumulative point cloud
         self.cumulative_points.append(new_points)
-
-        # Translate transformed_points back to the origin for the origin-aligned cumulative cloud
-        origin_translated_points = []
-        for i, original_point in enumerate(pc2.read_points(point_cloud_msg, skip_nans=True)):
-            # Subtract the translation from the transformed points to bring them to the origin
-            # Only apply this to the x, y, z coordinates
-            translated_to_origin_coords = np.array(transformed_points[i][:3]) - np.array(translation)
-            origin_translated_point = list(translated_to_origin_coords) + list(original_point[3:])
-            origin_translated_points.append(origin_translated_point)
-
-        self.cumulative_origin_points.append(origin_translated_points)
 
         points_cumulative_transformed = []
         for frame_points in self.cumulative_points:
@@ -235,9 +242,25 @@ class PointCloudTransformer:
             point_cloud_msg.fields,
             points_cumulative_transformed
         )
-
         rospy.loginfo("Publish cumulative PC")
         self.cumulative_cloud_pub.publish(cumulative_msg)
+        cumulative_points_duration_ms = (time.time() - cumulative_points_start_time) * 1000.0
+
+        # %% Cumulative origin points
+
+        # Translate transformed_points back to the origin for the origin-aligned cumulative cloud
+        translate_points_start_time = time.time()
+        origin_translated_points = []
+        for i, original_point in enumerate(pc2.read_points(point_cloud_msg, skip_nans=True)):
+            # Subtract the translation from the transformed points to bring them to the origin
+            # Only apply this to the x, y, z coordinates
+            translated_to_origin_coords = np.array(transformed_points[i][:3]) - np.array(translation)
+            origin_translated_point = list(translated_to_origin_coords) + list(original_point[3:])
+            origin_translated_points.append(origin_translated_point)
+        translate_points_duration_ms = (time.time() - translate_points_start_time) * 1000.0
+
+        cumulative_origin_points_start_time = time.time()
+        self.cumulative_origin_points.append(origin_translated_points)
 
         # Prepare points for the origin-aligned cumulative cloud
         points_cumulative_origin = []
@@ -252,6 +275,16 @@ class PointCloudTransformer:
         )
         rospy.loginfo("Publish cumulative origin PC")
         self.cumulative_origin_cloud_pub.publish(cumulative_origin_msg)
+        cumulative_origin_points_duration_ms = (time.time() - cumulative_origin_points_start_time) * 1000.0
+
+        return {
+            'pc_to_points_duration_ms': pc_to_points_duration_ms,
+            'transform_points_duration_ms': transform_points_duration_ms,
+            'pc_create_duration_ms': pc_create_duration_ms,
+            'cumulative_points_duration_ms': cumulative_points_duration_ms,
+            'translate_points_duration_ms': translate_points_duration_ms,
+            'cumulative_origin_points_duration_ms': cumulative_origin_points_duration_ms
+        }
 
     def transform_point_cloud(self, point_cloud, translation, rotation):
         # Convert input list to a (N, 3) NumPy array
