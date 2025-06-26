@@ -26,6 +26,30 @@ CUMULATIVE_POINT_CLOUD = '/cumulative_point_cloud'
 CUMULATIVE_ORIGIN_POINT_CLOUD = '/cumulative_origin_point_cloud'
 
 
+# %% Faster PC creation from NP
+def create_cloud_from_np(header, fields, np_array):
+    """
+    Fast version of create_cloud, using NumPy vectorized byte representation.
+    Assumes np_array is (N, 3) float32 for (x, y, z).
+    """
+
+    # Flatten the array to 1D byte representation
+    data = np_array.astype(np.float32).tobytes()
+
+    cloud_msg = PointCloud2()
+    cloud_msg.header = header
+    cloud_msg.height = 1
+    cloud_msg.width = np_array.shape[0]
+    cloud_msg.fields = fields
+    cloud_msg.is_bigendian = False
+    cloud_msg.point_step = 12  # 3 floats * 4 bytes
+    cloud_msg.row_step = cloud_msg.point_step * np_array.shape[0]
+    cloud_msg.is_dense = True
+    cloud_msg.data = data
+
+    return cloud_msg
+
+
 class PointCloudTransformer:
     def __init__(self):
         # Create a unique log file name with timestamp
@@ -205,44 +229,37 @@ class PointCloudTransformer:
 
         # %% Step 1: Convert PointCloud2 to list of full points (all fields)
         pc_to_points_start_time = time.time()
-        raw_points = list(pc2.read_points(point_cloud_msg, skip_nans=True))
+        xyz_cp = cp.asarray(list(pc2.read_points(point_cloud_msg, skip_nans=True, field_names=("x", "y", "z"))),
+                       dtype=cp.float32)
         pc_to_points_duration_ms = (time.time() - pc_to_points_start_time) * 1000.0
-
-        # Separate xyz and extra fields
-        xyz = [p[:3] for p in raw_points]
-        extras = [p[3:] for p in raw_points]
 
         # %% Step 2: Transform Points with CuPy
         transform_points_start_time = time.time()
-        xyz_cp = cp.asarray(xyz, dtype=cp.float32)
         ones = cp.ones((xyz_cp.shape[0], 1), dtype=cp.float32)
         homogeneous = cp.concatenate((xyz_cp, ones), axis=1)
 
         rot_mat_cp = cp.asarray(transformations.quaternion_matrix(rotation), dtype=cp.float32)
         transformed_cp = homogeneous @ rot_mat_cp.T
         transformed_xyz = transformed_cp[:, :3] + cp.asarray(translation, dtype=cp.float32)
-        transformed_points = transformed_xyz.get().tolist()
+        transformed_points = transformed_xyz.get()
         transform_points_duration_ms = (time.time() - transform_points_start_time) * 1000.0
-
-        # %% Step 3: Merge transformed points and extras
-        new_points = [list(transformed_points[i]) + list(extras[i]) for i in range(len(transformed_points))]
 
         # %% Step 4: Create and publish transformed point cloud
         pc_create_start_time = time.time()
-        transformed_msg = pc2.create_cloud(
+        transformed_msg = create_cloud_from_np(
             point_cloud_msg.header,
             point_cloud_msg.fields,
-            new_points
+            transformed_points
         )
         pc_create_duration_ms = (time.time() - pc_create_start_time) * 1000.0
         self.point_cloud_pub.publish(transformed_msg)
 
         # %% Step 5: Update cumulative transformed cloud
         cumulative_points_start_time = time.time()
-        self.cumulative_points.append(new_points)
-        points_cumulative_transformed = [pt for frame in self.cumulative_points for pt in frame]
+        self.cumulative_points.append(transformed_points)
+        points_cumulative_transformed = np.vstack(self.cumulative_points)
         cumulative_points_create_cloud_start_time = time.time()
-        cumulative_msg = pc2.create_cloud(
+        cumulative_msg = create_cloud_from_np(
             point_cloud_msg.header,
             point_cloud_msg.fields,
             points_cumulative_transformed
@@ -253,17 +270,15 @@ class PointCloudTransformer:
 
         # %% Step 6: Translate points back to origin
         translate_points_start_time = time.time()
-        translated_to_origin = (transformed_xyz - cp.asarray(translation, dtype=cp.float32)).get().tolist()
-        origin_translated_points = [list(translated_to_origin[i]) + list(extras[i]) for i in
-                                    range(len(translated_to_origin))]
+        translated_to_origin = transformed_points - np.array(translation, dtype=np.float32)
         translate_points_duration_ms = (time.time() - translate_points_start_time) * 1000.0
 
         # %% Step 7: Cumulative origin-aligned cloud
         cumulative_origin_points_start_time = time.time()
-        self.cumulative_origin_points.append(origin_translated_points)
-        points_cumulative_origin = [pt for frame in self.cumulative_origin_points for pt in frame]
+        self.cumulative_origin_points.append(translated_to_origin)
+        points_cumulative_origin = np.vstack(self.cumulative_origin_points)
         cum_origin_create_cloud_start_time = time.time()
-        cumulative_origin_msg = pc2.create_cloud(
+        cumulative_origin_msg = create_cloud_from_np(
             point_cloud_msg.header,
             point_cloud_msg.fields,
             points_cumulative_origin

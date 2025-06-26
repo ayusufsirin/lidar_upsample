@@ -32,3 +32,7 @@ değiştirildi.
 
 `lidar_upsample.py` koduna yönlendim ve buradaki takılma ve gecikme sorunlarına el atmaya başladım. ~500 ms olan gecikme
 değerini düşürmek için önce profiling işlemlerini ekliyorum.  
+
+# 26.06.2025
+
+Lidar upsample için optimizasyonlar yapıldı ve işlem süresi yaklaşık 20 kat düşürüldü.
