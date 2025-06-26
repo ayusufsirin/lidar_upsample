@@ -8,6 +8,7 @@ import time
 from collections import deque
 from datetime import datetime
 
+import cupy as cp
 import message_filters
 import numpy as np
 import rospy
@@ -58,8 +59,10 @@ class PointCloudTransformer:
             'transform_points_duration_ms',
             'pc_create_duration_ms',
             'cumulative_points_duration_ms',
+            'cumulative_points_create_cloud_duration_ms',
             'translate_points_duration_ms',
-            'cumulative_origin_points_duration_ms,',
+            'cumulative_origin_points_duration_ms',
+            'cumulative_origin_points_create_cloud_duration_ms',
             "processing_rate_Hz",
             "input_rate_Hz",
             "throughput_ratio",
@@ -200,80 +203,73 @@ class PointCloudTransformer:
             rospy.logwarn("Odometry data not yet available, skipping point cloud transformation.")
             return
 
-        # %% Convert the PointCloud2 message to a list of points
+        # %% Step 1: Convert PointCloud2 to list of full points (all fields)
         pc_to_points_start_time = time.time()
-        point_list = list(pc2.read_points(point_cloud_msg, skip_nans=True, field_names=("x", "y", "z")))
+        raw_points = list(pc2.read_points(point_cloud_msg, skip_nans=True))
         pc_to_points_duration_ms = (time.time() - pc_to_points_start_time) * 1000.0
 
-        # %% Transform PC
+        # Separate xyz and extra fields
+        xyz = [p[:3] for p in raw_points]
+        extras = [p[3:] for p in raw_points]
+
+        # %% Step 2: Transform Points with CuPy
         transform_points_start_time = time.time()
-        # Transform the point cloud using odometry data
-        transformed_points = self.transform_point_cloud(point_list, translation, rotation)
+        xyz_cp = cp.asarray(xyz, dtype=cp.float32)
+        ones = cp.ones((xyz_cp.shape[0], 1), dtype=cp.float32)
+        homogeneous = cp.concatenate((xyz_cp, ones), axis=1)
+
+        rot_mat_cp = cp.asarray(transformations.quaternion_matrix(rotation), dtype=cp.float32)
+        transformed_cp = homogeneous @ rot_mat_cp.T
+        transformed_xyz = transformed_cp[:, :3] + cp.asarray(translation, dtype=cp.float32)
+        transformed_points = transformed_xyz.get().tolist()
         transform_points_duration_ms = (time.time() - transform_points_start_time) * 1000.0
 
-        # Add additional fields from the original point cloud
-        new_points = []
-        for i, original_point in enumerate(pc2.read_points(point_cloud_msg, skip_nans=True)):
-            new_point = list(transformed_points[i]) + list(original_point[3:])
-            new_points.append(new_point)
+        # %% Step 3: Merge transformed points and extras
+        new_points = [list(transformed_points[i]) + list(extras[i]) for i in range(len(transformed_points))]
 
-        # %% Transformed PC message
-        # Create a new PointCloud2 message with the transformed points
+        # %% Step 4: Create and publish transformed point cloud
         pc_create_start_time = time.time()
-        transformed_msg = pc2.create_cloud(point_cloud_msg.header, point_cloud_msg.fields, new_points)
+        transformed_msg = pc2.create_cloud(
+            point_cloud_msg.header,
+            point_cloud_msg.fields,
+            new_points
+        )
         pc_create_duration_ms = (time.time() - pc_create_start_time) * 1000.0
-
-        # Publish the transformed point cloud
         self.point_cloud_pub.publish(transformed_msg)
 
-        # %% Cumulative points
+        # %% Step 5: Update cumulative transformed cloud
         cumulative_points_start_time = time.time()
-
-        # Add the new points to the cumulative point cloud
         self.cumulative_points.append(new_points)
-
-        points_cumulative_transformed = []
-        for frame_points in self.cumulative_points:
-            points_cumulative_transformed.extend(frame_points)
-
-        # Create and publish the cumulative PointCloud2 message (transformed to global frame)
+        points_cumulative_transformed = [pt for frame in self.cumulative_points for pt in frame]
+        cumulative_points_create_cloud_start_time = time.time()
         cumulative_msg = pc2.create_cloud(
             point_cloud_msg.header,
             point_cloud_msg.fields,
             points_cumulative_transformed
         )
-        rospy.loginfo("Publish cumulative PC")
+        cumulative_points_create_cloud_duration_ms = (time.time() - cumulative_points_create_cloud_start_time) * 1000.0
         self.cumulative_cloud_pub.publish(cumulative_msg)
         cumulative_points_duration_ms = (time.time() - cumulative_points_start_time) * 1000.0
 
-        # %% Cumulative origin points
-
-        # Translate transformed_points back to the origin for the origin-aligned cumulative cloud
+        # %% Step 6: Translate points back to origin
         translate_points_start_time = time.time()
-        origin_translated_points = []
-        for i, original_point in enumerate(pc2.read_points(point_cloud_msg, skip_nans=True)):
-            # Subtract the translation from the transformed points to bring them to the origin
-            # Only apply this to the x, y, z coordinates
-            translated_to_origin_coords = np.array(transformed_points[i][:3]) - np.array(translation)
-            origin_translated_point = list(translated_to_origin_coords) + list(original_point[3:])
-            origin_translated_points.append(origin_translated_point)
+        translated_to_origin = (transformed_xyz - cp.asarray(translation, dtype=cp.float32)).get().tolist()
+        origin_translated_points = [list(translated_to_origin[i]) + list(extras[i]) for i in
+                                    range(len(translated_to_origin))]
         translate_points_duration_ms = (time.time() - translate_points_start_time) * 1000.0
 
+        # %% Step 7: Cumulative origin-aligned cloud
         cumulative_origin_points_start_time = time.time()
         self.cumulative_origin_points.append(origin_translated_points)
-
-        # Prepare points for the origin-aligned cumulative cloud
-        points_cumulative_origin = []
-        for frame_points in self.cumulative_origin_points:
-            points_cumulative_origin.extend(frame_points)
-
-        # Create and publish the origin-aligned cumulative PointCloud2 message
+        points_cumulative_origin = [pt for frame in self.cumulative_origin_points for pt in frame]
+        cum_origin_create_cloud_start_time = time.time()
         cumulative_origin_msg = pc2.create_cloud(
             point_cloud_msg.header,
             point_cloud_msg.fields,
             points_cumulative_origin
         )
-        rospy.loginfo("Publish cumulative origin PC")
+        cum_origin_points_create_cloud_duration_ms = (time.time() - cum_origin_create_cloud_start_time) * 1000.0
+
         self.cumulative_origin_cloud_pub.publish(cumulative_origin_msg)
         cumulative_origin_points_duration_ms = (time.time() - cumulative_origin_points_start_time) * 1000.0
 
@@ -282,8 +278,10 @@ class PointCloudTransformer:
             'transform_points_duration_ms': transform_points_duration_ms,
             'pc_create_duration_ms': pc_create_duration_ms,
             'cumulative_points_duration_ms': cumulative_points_duration_ms,
+            'cumulative_points_create_cloud_duration_ms': cumulative_points_create_cloud_duration_ms,
             'translate_points_duration_ms': translate_points_duration_ms,
-            'cumulative_origin_points_duration_ms': cumulative_origin_points_duration_ms
+            'cumulative_origin_points_duration_ms': cumulative_origin_points_duration_ms,
+            'cumulative_origin_points_create_cloud_duration_ms': cum_origin_points_create_cloud_duration_ms,
         }
 
     def transform_point_cloud(self, point_cloud, translation, rotation):
