@@ -25,6 +25,7 @@ TRANSFORMED_POINT_CLOUD = '/transformed_point_cloud'
 CUMULATIVE_POINT_CLOUD = '/cumulative_point_cloud'
 CUMULATIVE_ORIGIN_POINT_CLOUD = '/cumulative_origin_point_cloud'
 
+rospy.set_param('/use_sim_time', True)
 
 # %% Faster PC creation from NP
 def create_cloud_from_np(header, fields, np_array):
@@ -112,7 +113,7 @@ class PointCloudTransformer:
         odom_sub = message_filters.Subscriber(ODOM_TOPIC, Odometry)
 
         # ApproximateTime synchronizer
-        ts = message_filters.ApproximateTimeSynchronizer([pc_sub, odom_sub], queue_size=10, slop=0.1)
+        ts = message_filters.ApproximateTimeSynchronizer([pc_sub, odom_sub], queue_size=10, slop=0.1, reset=True)
         ts.registerCallback(self.synced_callback)
 
         # Initialize publishers

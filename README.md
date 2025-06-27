@@ -36,13 +36,16 @@ rosbag play /home/joseph/Development/DS/2023-05-08-20-25-52.bag -l
 ```
 
 ```bash
-rosbag play /home/joseph/Development/DS/2023-05-08-20-25-52.bag -l -s 55 --rate 1.0
+rosbag play /home/joseph/Development/DS/2023-05-08-20-25-52.bag -l -s 55 --rate 0.1
 ```
 
 ### CitrusFarm Dataset
 
+> :info: `--clock` flag is passed to be able to use the simulation time on the ros nodes. Otherwise, the
+`ApproximateTimeSynchronizer` could not work fine when rosbag restarts
+
 ```bash
-rosbag play -l -s 10 -u 10 \
+rosbag play -l -s 10 -u 10 --clock \
 ~/Development/DS/Citrus-Farm-Dataset/01_13B_Jackal/base_2023-07-18-14-26-48_0.bag \
 ~/Development/DS/Citrus-Farm-Dataset/01_13B_Jackal/zed_2023-07-18-14-26-49_0.bag \
 ~/Development/DS/Citrus-Farm-Dataset/01_13B_Jackal/odom_2023-07-18-14-26-48.bag
