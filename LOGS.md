@@ -37,6 +37,10 @@ değerini düşürmek için önce profiling işlemlerini ekliyorum.
 
 Lidar upsample için optimizasyonlar yapıldı ve işlem süresi yaklaşık 20 kat düşürüldü.
 
-# 27.07.2025
+# 27.06.2025
 
 Lidar upsample'daki rosbag yeniden başlayınca donma problemi giderildi.
+
+# 29.06.2025
+
+VLP point cloud mesajindan depth imaj olusturma problemi giderildi.
