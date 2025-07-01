@@ -31,7 +31,7 @@ değiştirildi.
 # 25.06.2025
 
 `lidar_upsample.py` koduna yönlendim ve buradaki takılma ve gecikme sorunlarına el atmaya başladım. ~500 ms olan gecikme
-değerini düşürmek için önce profiling işlemlerini ekliyorum.  
+değerini düşürmek için önce profiling işlemlerini ekliyorum.
 
 # 26.06.2025
 
@@ -44,3 +44,16 @@ Lidar upsample'daki rosbag yeniden başlayınca donma problemi giderildi.
 # 29.06.2025
 
 VLP point cloud mesajindan depth imaj olusturma problemi giderildi.
+
+# 01.07.2025
+
+Algoritmadaki orijinden başlayan atlamaların sebebinin `NaN` noktaların `0` olarak değiştirilmesi olduğu görülmüştür.
+Bunun çözümü olarak `40` değeri konularak denenmiş ve bu şekilde de yine sorun olduğu görülmüştür.
+
+![pg_nan_filled_40.png](pg_nan_filled_40.png)
+
+40
+
+![pg_nan_filled_1.png](pg_nan_filled_1.png)
+
+0
