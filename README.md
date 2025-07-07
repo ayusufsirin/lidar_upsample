@@ -25,7 +25,7 @@ graph TD
 ## Run
 
 ```bash
-docker compose up
+roscore
 ```
 
 ### SensorSuiteV2 Dataset
@@ -55,7 +55,7 @@ rosbag play -l -s 10 -u 10 --clock \
 > delay between some topics.
 
 ```bash
-rosbag play -l -s 10 -u 10 -r 0.1 \
+rosbag play -l -s 10 -u 10 -r 0.1 --clock \
 ~/Development/DS/Citrus-Farm-Dataset/01_13B_Jackal/base_2023-07-18-14-26-48_0.bag \
 ~/Development/DS/Citrus-Farm-Dataset/01_13B_Jackal/zed_2023-07-18-14-26-49_0.bag \
 ~/Development/DS/Citrus-Farm-Dataset/01_13B_Jackal/odom_2023-07-18-14-26-48.bag

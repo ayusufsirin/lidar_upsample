@@ -57,3 +57,22 @@ Bunun çözümü olarak `40` değeri konularak denenmiş ve bu şekilde de yine 
 ![pg_nan_filled_1.png](pg_nan_filled_1.png)
 
 0
+
+# 04.07.2025
+
+Satranç tahtası şeklindeki sentetik veri kullanılarak algoritmanın çalıştığı doğrulandı. Aşağıdaki gibi sonuçlar elde
+edildi. İsmail hoca sonuçların gayet iyi olduğunu söyledi. Benzer görüntünün gerçek veri ile elde edilememesinin
+sebebinin ZED kamera ile VLP Lidarın FOV kesişimlerinin PG FOV olarak kullanılmamamsı olabileveğini söyledi.
+
+ZED:
+
+![img.png](assets/dama_zed.png)
+
+VLP:
+
+![img_2.png](assets/dama_vlp.png)
+
+PG:
+
+![img_1.png](assets/dama_pg.png)
+
