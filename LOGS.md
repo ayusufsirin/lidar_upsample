@@ -101,4 +101,13 @@ Farklı frekans değerleri için elde edilen görüntüler aşağıdaki tabloda 
 | 0.08                | 100        | ![dama_0.08_100.png](assets/dama_0.08_100.png) |
 | 0.16                | 100        | ![dama_0.16_100.png](assets/dama_0.16_100.png) |
 
+## VLP upsamling ile ilgili problem
 
+Sensörlerin anlık olarak göremediği ancak historical olarak tutulan VLP verisinde olan ve aslında gölgelenmiş olması
+gereken bir takım noktalar ortaya çıkıyor. Bu da algoritmanın ZED noktalarını bu uzak noktalara yakınsamaya calısmasına
+sebep oluyor. Yakınsanmaya çalışılan ZED ve VLP noktaları birbirinden çok uzaklaştığı için low-pass etkiye maruz
+kaldıklarında orijine kadar uzanan spike gibi bir geometri ortaya çıkıyor.
+
+Çözüm önerileri:
+
+- Band-reject filtre denenebilir
