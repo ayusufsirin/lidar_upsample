@@ -66,13 +66,39 @@ sebebinin ZED kamera ile VLP Lidarın FOV kesişimlerinin PG FOV olarak kullanı
 
 ZED:
 
-![img.png](assets/dama_zed.png)
+![dama_zed.png](assets/dama_zed.png)
 
 VLP:
 
-![img_2.png](assets/dama_vlp.png)
+![dama_vlp.png](assets/dama_vlp.png)
 
 PG:
 
-![img_1.png](assets/dama_pg.png)
+![dama_pg.png](assets/dama_pg.png)
+
+# 07.07.2025
+
+- Önce yüzey düzlemlerinin bulunduğu ve bu düzlemlerin eksenlerine uygun olarak PG'nin işlendiği bir yapı kurulabilir.
+  Bu sayede yakınsama daha iyi olacaktır. Örnek vermek gerekirse zemin yüzeyi her zaman kameraya dik olduğu için bu
+  alanlarda yakınsama yapmak çok da mümkün olmayabilir. Halbuki önerilen yöntem ile doğru düzlemde PG uygulanabilir.
+  Bunun uygulanması tamamen paralel olabilecektir.
+
+- Bir diğer öneri ise derinlik imajı alınmadan önce bir önişleme olarak kamera yatay ekseninde tüm nokta kümelerinin
+  rotasyona uyratılması. Bu şekilde zemin yüzeyi noktalarının derinlik imajında daha geniş bir alana projekt etmesi
+  sağlanacaktır.
+
+  > :warning: Bu yapılırken overlap olacak noktalara dikkat edilmelidir.
+
+## PG parametre ayarları
+
+Farklı frekans değerleri için elde edilen görüntüler aşağıdaki tabloda verilmiştir.
+
+| Cutoff (Normalized) | Iterations | Image                                          |
+|---------------------|------------|------------------------------------------------|
+| 0.01                | 100        | ![dama_0.01_100.png](assets/dama_0.01_100.png) |
+| 0.02                | 100        | ![dama_0.02_100.png](assets/dama_0.02_100.png) |
+| 0.04                | 100        | ![dama_0.04_100.png](assets/dama_0.04_100.png) |
+| 0.08                | 100        | ![dama_0.08_100.png](assets/dama_0.08_100.png) |
+| 0.16                | 100        | ![dama_0.16_100.png](assets/dama_0.16_100.png) |
+
 
