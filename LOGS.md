@@ -111,3 +111,9 @@ kaldıklarında orijine kadar uzanan spike gibi bir geometri ortaya çıkıyor.
 Çözüm önerileri:
 
 - Band-reject filtre denenebilir
+
+# 10.07.2025
+
+Jump problemini gidermek icin ZED frame ile VLP frame arasında bir covariance matrix çıkartılarak yüksek varyanslı lidar
+noktaları düzeltme için kullanılmayabilir. Nihayetinde ZED frame iyileştirilmeye çalışıldığı ve zorla güzellik
+olmayacağı için elden geldiği kadar yapmak daha yerinde olabilir. 
