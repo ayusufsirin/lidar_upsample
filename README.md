@@ -18,7 +18,7 @@ Hardware:
 The bag files are collected from two different datasets with similar ROS topics. One of them is CitrusFarm and
 the other one is SensorSuiteV2 dataset.
 
-```mermaid\
+```mermaid
 graph TD
     Datasets ---> CitrusFarmDataset;
     Datasets ---> SensorSuiteV2Dataset;
