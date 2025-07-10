@@ -8,6 +8,11 @@ Current dependencies:
 - Ubuntu 20.04
 - Python 3.8.10
 
+Hardware:
+
+- Velodyne VLP-16
+- StereoLabs ZED2i
+
 ## Bags
 
 The bag files are collected from two different datasets with similar ROS topics. One of them is CitrusFarm and
