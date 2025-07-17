@@ -148,6 +148,7 @@ görülmektedir. Beyaz renk ZED, kırmızı renk VLP verilerine aittir.
 
 - `ncutoff`: 0.16
 - `threshold`: 33
+- `vlp_zed_diff_max`: 50.0
 
 ![assets/citrus_gaussian_0.16_33.png](assets/citrus_gaussian_0.16_33.png)
 
