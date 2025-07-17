@@ -124,3 +124,29 @@ Yukarıdakı öneri sonrası çıktı:
 ![variance_filtered_all.png](assets/variance_filtered_all.png)
 
 > :note: Bu çıktı teoridekine uygun olarak spike'ları azaltmış oldu.
+
+İyileşmelere rağmen hala küçük spike'lar mevcut. Bunları da gidermek için ne yapılması gerektiği tartışılabilir.
+
+İmajların kare olmaması LPF fonsiyonu circle çizerek çalıştığı için probleme sebep oluyor. Ya imajlar kare olmalı ya da
+elips maske denenmeli.
+
+> Elips maske deneyince dikdortgen ve kare imajlar arasındaki fark ortadan kalktı
+
+# 17.07.2025
+
+Varsayılan Brick-wall LPF yerine Gaussian ve Butterworth filtreler denendi. Sonuçlar oldukça iyi. Aşağıdaki raporda
+görseller mevcut.
+
+| Cutoff (Normalized) | Iterations | Type        | Image                                                                           |
+|---------------------|------------|-------------|---------------------------------------------------------------------------------|
+| 0.64                | 2000       | Gaussian    | ![assets/dama_gaussian_0.64_2000.png](assets/dama_gaussian_0.64_2000.png)       |
+| 0.64                | 2000       | Butterworth | ![assets/dama_butterworth_0.64_2000.png](assets/dama_butterworth_0.64_2000.png) |
+| 0.64                | 2000       | Brick-wall  | ![assets/dama_brick-wall_0.64_2000.png](assets/dama_brick-wall_0.64_2000.png)   |
+
+Gökkuşağı şeklinde görünen PG çıktısı görüldüğü üzere VLP'ye yakınlaşmıştır. Aynı zamanda iyileşme de net bir şekilde
+görülmektedir. Beyaz renk ZED, kırmızı renk VLP verilerine aittir.
+
+- `ncutoff`: 0.16
+- `threshold`: 33
+
+![assets/citrus_gaussian_0.16_33.png](assets/citrus_gaussian_0.16_33.png)
