@@ -150,3 +150,6 @@ görülmektedir. Beyaz renk ZED, kırmızı renk VLP verilerine aittir.
 - `threshold`: 33
 
 ![assets/citrus_gaussian_0.16_33.png](assets/citrus_gaussian_0.16_33.png)
+
+> :warning: Bu yöntemde zeminin çok bozulduğunu fark ettim. Buna bir çözüm bulmak şart gibi. Aklıma ilk gelen zaten
+> zeminde yoğün olan VLP verisini kullanmak.
