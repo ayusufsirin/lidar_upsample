@@ -64,9 +64,9 @@ rosbag play /home/joseph/Development/DS/2023-05-08-20-25-52.bag -l -s 55 --rate 
 
 ```bash
 rosbag play -l -s 10 -u 10 --clock \
-~/Development/DS/Citrus-Farm-Dataset/01_13B_Jackal/base_2023-07-18-14-26-48_0.bag \
-~/Development/DS/Citrus-Farm-Dataset/01_13B_Jackal/zed_2023-07-18-14-26-49_0.bag \
-~/Development/DS/Citrus-Farm-Dataset/01_13B_Jackal/odom_2023-07-18-14-26-48.bag
+~/Development/DS/Citrus-Farm-Dataset/01_13B_Jackal/base_*.bag \
+~/Development/DS/Citrus-Farm-Dataset/01_13B_Jackal/zed_*.bag \
+~/Development/DS/Citrus-Farm-Dataset/01_13B_Jackal/odom_*.bag
 ```
 
 > :warning: To make all the topics synchronized, we have to make the reply rate 0.1 (etc.). Otherwise, there will be
@@ -74,9 +74,17 @@ rosbag play -l -s 10 -u 10 --clock \
 
 ```bash
 rosbag play -l -s 10 -u 10 -r 0.1 --clock \
-~/Development/DS/Citrus-Farm-Dataset/01_13B_Jackal/base_2023-07-18-14-26-48_0.bag \
-~/Development/DS/Citrus-Farm-Dataset/01_13B_Jackal/zed_2023-07-18-14-26-49_0.bag \
-~/Development/DS/Citrus-Farm-Dataset/01_13B_Jackal/odom_2023-07-18-14-26-48.bag
+~/Development/DS/Citrus-Farm-Dataset/01_13B_Jackal/base_*.bag \
+~/Development/DS/Citrus-Farm-Dataset/01_13B_Jackal/zed_*.bag \
+~/Development/DS/Citrus-Farm-Dataset/01_13B_Jackal/odom_*.bag
+```
+
+```bash
+rosbag play -l -s 10 -u 10 -r 0.1 --clock \
+~/Development/DS/Citrus-Farm-Dataset/01_13B_Jackal/base_*.bag \
+~/Development/DS/Citrus-Farm-Dataset/01_13B_Jackal/zed_*.bag \
+~/Development/DS/Citrus-Farm-Dataset/01_13B_Jackal/odom_*.bag \
+~/Development/DS/Citrus-Farm-Dataset/01_13B_Jackal/gt.bag
 ```
 
 ## Run Topic Transformer
@@ -114,10 +122,10 @@ rviz -d /media/joseph/Development/GitHub/lidar_upsample/rviz.rviz
 > :warning: GT olmadan bag oynat!
 
 ```bash
-rosbag play -s 0 -u 20 -r 1.0 --clock \
-~/Development/DS/Citrus-Farm-Dataset/01_13B_Jackal/base_2023-07-18-14-26-48_0.bag \
-~/Development/DS/Citrus-Farm-Dataset/01_13B_Jackal/zed_2023-07-18-14-26-49_0.bag \
-~/Development/DS/Citrus-Farm-Dataset/01_13B_Jackal/odom_2023-07-18-14-26-48.bag
+rosbag play -s 0 -u 100 -r 1.0 --clock \
+~/Development/DS/Citrus-Farm-Dataset/01_13B_Jackal/base_*.bag \
+~/Development/DS/Citrus-Farm-Dataset/01_13B_Jackal/zed_*.bag \
+~/Development/DS/Citrus-Farm-Dataset/01_13B_Jackal/odom_*.bag
 ```
 
 ZED:
