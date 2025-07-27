@@ -127,6 +127,7 @@ rosrun tf static_transform_publisher 0 0 0 0 0 0 map odom 100
 python3 odom_to_tf.py
 #rosrun tf static_transform_publisher 0 0 0 0 0 0 odom base_link 100
 rosrun tf2_ros static_transform_publisher 0 0 0.1 0 0 0 base_link zed2i_left_camera_optical_frame
+rosrun tf2_ros static_transform_publisher 0 0 0.1 0 0 0 base_link velodyne
 rosrun tf2_ros static_transform_publisher 0 0 0.1 0 0 0 base_link zed2i_base_link
 rosrun tf2_ros static_transform_publisher 0 0 0.1 0 0 0 zed2i_base_link zed2i_imu_link
 ```
@@ -140,8 +141,11 @@ roslaunch rtabmap_launch rtabmap.launch \
  camera_info_topic:=/zed2i/zed_node/left/camera_info \
  depth_camera_info_topic:=/zed2i/zed_node/depth/camera_info \
  imu_topic:=/zed2i/zed_node/imu/data \
+ odom_topic:=/jackal_velocity_controller/odom \
  frame_id:=zed2i_base_link \
  approx_sync:=true \
  wait_imu_to_init:=true \
- use_sim_time:=true
+ use_sim_time:=true \
+ publish_tf:=false \
+ rtabmap_args:="--delete_db_on_start"
 ```
