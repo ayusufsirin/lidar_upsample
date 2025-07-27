@@ -119,6 +119,10 @@ rviz -d /media/joseph/Development/GitHub/lidar_upsample/rviz.rviz
 
 # RTABMap
 
+```bash
+roscore
+```
+
 > :warning: GT olmadan bag oynat!
 
 ```bash
@@ -128,17 +132,11 @@ rosbag play -s 0 -u 100 -r 1.0 --clock \
 ~/Development/DS/Citrus-Farm-Dataset/01_13B_Jackal/odom_*.bag
 ```
 
-ZED:
-
 ```bash
-rosrun tf static_transform_publisher 0 0 0 0 0 0 map odom 100
-python3 odom_to_tf.py
-#rosrun tf static_transform_publisher 0 0 0 0 0 0 odom base_link 100
-rosrun tf2_ros static_transform_publisher 0 0 0.1 0 0 0 base_link zed2i_left_camera_optical_frame
-rosrun tf2_ros static_transform_publisher 0 0 0.1 0 0 0 base_link velodyne
-rosrun tf2_ros static_transform_publisher 0 0 0.1 0 0 0 base_link zed2i_base_link
-rosrun tf2_ros static_transform_publisher 0 0 0.1 0 0 0 zed2i_base_link zed2i_imu_link
+/home/joseph/PycharmProjects/citrusFarmSFITC/citrus_farm_dataset_tf_publisher.sh
 ```
+
+ZED:
 
 https://medium.com/@basilshaji32/zed2i-vslam-setup-with-rtab-map-using-ros2-a16083630b86
 
@@ -156,4 +154,10 @@ roslaunch rtabmap_launch rtabmap.launch \
  use_sim_time:=true \
  publish_tf:=false \
  rtabmap_args:="--delete_db_on_start"
+```
+
+# imu_topic:=/microstrain/imu/data \
+
+```bash
+rviz -d /media/joseph/Development/GitHub/lidar_upsample/rviz.rviz
 ```

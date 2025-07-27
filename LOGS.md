@@ -173,7 +173,8 @@ daha sonra da kendi verisetimizi oluşturarak bir paper çıkartabiliriz diye d�
 
 Outdoor SLAM papers:
 
-- [H. Teng, Y. Wang, X. Song and K. Karydis, “Multimodal Dataset for Localization, Mapping and Crop Monitoring in Citrus Tree Farms”, In International Symposium on Visual Computing (ISVC 2023), **page588**](https://link.springer.com/chapter/10.1007/978-3-031-47969-4_44)
+- [H. Teng, Y. Wang, X. Song and K. Karydis, “Multimodal Dataset for Localization, Mapping and Crop Monitoring in Citrus Tree Farms”, In International Symposium on Visual Computing (ISVC 2023),
+  **page588**](https://link.springer.com/chapter/10.1007/978-3-031-47969-4_44)
 - [Outdoor RGB-D Mapping Using Intel-RealSense](https://ieeexplore.ieee.org/document/8956916)
 - [Work-is-Playing](https://grauonline.de/wordpress/?page_id=1282)
 - [ARDUMOWER VISION / TANGOANYWHERE – CAMERA-BASED POSITION ESTIMATION USING A GOOGLE TANGO PHONE](https://grauonline.de/wordpress/?page_id=2109)
@@ -182,7 +183,7 @@ Outdoor SLAM papers:
 # 23.07.2025
 
 Hocayla görüşmeye geldim. Beklerken yaptığım araştırmalar:
- 
+
 - https://dsp.stackexchange.com/questions/46014/gaussian-filter-as-a-low-pass-filter
 - [Paper için yapılabilecek deneyler (ChatGPT Export)](./docs/ChatGPT-LiDAR_stereo_fusion_experiments.md)
 - [Paper için yapılabilecek deneyler (ChatGPT Link)](https://chatgpt.com/share/688094a5-81c0-8007-aaf7-6c918f763265)
@@ -195,3 +196,12 @@ Görüşme sonrası notlar:
 # 25.07.2025
 
 `inpaint` metodu CUDA kütüphanelerini kullanacak şekilde değiştirildi.
+
+# 27.07.2025
+
+RTABMap ile ZED kamerayı SLAM yapmaya çalışıyorum. TF topic'i ile uğraştım, oldu gibi ama şimdi de ZED kamera PC'u
+rotated görünüyor. 
+
+# 28.08.2025
+
+IMU topic'leri 200 Hz olduğu için 50 Hz olan TF topic'i 4 katına çıkmalı.
