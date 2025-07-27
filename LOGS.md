@@ -154,3 +154,44 @@ görülmektedir. Beyaz renk ZED, kırmızı renk VLP verilerine aittir.
 
 > :warning: Bu yöntemde zeminin çok bozulduğunu fark ettim. Buna bir çözüm bulmak şart gibi. Aklıma ilk gelen zaten
 > zeminde yoğün olan VLP verisini kullanmak.
+
+# 19.07.2025
+
+Artık gözle görülür bir iyileşme olduğu için [CitrusFarmDataset](https://ucr-robotics.github.io/Citrus-Farm-Dataset/)'in
+GT odometry topic'ini kullanarak bir kıyas yapmam gerektiğine karar verdim. Burada yol haritası olarak danışman hocamla
+konuşmadan önce aklıma gelenleri aşağıda sırasıyla listeledim:
+
+1. GT odometry topic incelenmeli ve VLP upsamling için kullanılan odom ile farkının grafiği çıkartılmalı. (
+   bkz. https://openaccess.thecvf.com/content_cvpr_2017/papers/Tateno_CNN-SLAM_Real-Time_Dense_CVPR_2017_paper.pdf,
+   tablo "(A) Comparison on Pose Trajectory Accuracy")
+2. PG odom topic'e basılacak odom bilgisini üretmek için **State-of-the-Art** "Depth Map SLAM" paper'ları incelenmeli ve
+   buralarda propose edilen yöntemlerin ZED depth ve PG depth kullanıldığı durumlardaki çıktıları (ve whell odom ile) 1.
+   maddedeki gibi plot edilmeli.
+
+Bahsi geçen iki madde yapıldığında bir paper çıkarmış gibi geliyor. Hoca onaylarsa önce bu şekilde bir paper çıkartıp
+daha sonra da kendi verisetimizi oluşturarak bir paper çıkartabiliriz diye düşünüyorum.
+
+Outdoor SLAM papers:
+
+- [H. Teng, Y. Wang, X. Song and K. Karydis, “Multimodal Dataset for Localization, Mapping and Crop Monitoring in Citrus Tree Farms”, In International Symposium on Visual Computing (ISVC 2023), **page588**](https://link.springer.com/chapter/10.1007/978-3-031-47969-4_44)
+- [Outdoor RGB-D Mapping Using Intel-RealSense](https://ieeexplore.ieee.org/document/8956916)
+- [Work-is-Playing](https://grauonline.de/wordpress/?page_id=1282)
+- [ARDUMOWER VISION / TANGOANYWHERE – CAMERA-BASED POSITION ESTIMATION USING A GOOGLE TANGO PHONE](https://grauonline.de/wordpress/?page_id=2109)
+- [RTABMap](https://introlab.github.io/rtabmap/)
+
+# 23.07.2025
+
+Hocayla görüşmeye geldim. Beklerken yaptığım araştırmalar:
+ 
+- https://dsp.stackexchange.com/questions/46014/gaussian-filter-as-a-low-pass-filter
+- [Paper için yapılabilecek deneyler (ChatGPT Export)](./docs/ChatGPT-LiDAR_stereo_fusion_experiments.md)
+- [Paper için yapılabilecek deneyler (ChatGPT Link)](https://chatgpt.com/share/688094a5-81c0-8007-aaf7-6c918f763265)
+
+Görüşme sonrası notlar:
+
+- Frame bazında karşılaştırma yapma dedi.
+- Geriye kalanlar planladığım gibi.
+
+# 25.07.2025
+
+`inpaint` metodu CUDA kütüphanelerini kullanacak şekilde değiştirildi.
