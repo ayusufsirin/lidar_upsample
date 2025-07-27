@@ -46,6 +46,19 @@ rosbag play /home/joseph/Development/DS/2023-05-08-20-25-52.bag -l -s 55 --rate 
 
 ### CitrusFarm Dataset
 
+# https://ucr-robotics.github.io/Citrus-Farm-Dataset/calibration.html
+
+| Parent Frame    | Child Frame     | x[m]    | y[m]    | z[m]    | qx     | qy      | qz      | qw      |
+|-----------------|-----------------|---------|---------|---------|--------|---------|---------|---------|
+| base_link       | velodyne        | 0.0400  | 0.0000  | 0.3787  | 0.0000 | 0.0000  | 0.0000  | 1.0000  |
+| velodyne        | gps_rtk         | -0.2200 | 0.0000  | 0.1530  | 0.0000 | 0.0000  | 0.0000  | 1.0000  |
+| velodyne        | flir_blackfly   | 0.2178  | 0.0049  | -0.0645 | 0.5076 | -0.4989 | 0.4960  | -0.4974 |
+| flir_blackfly   | microstrain_imu | -0.0061 | 0.0157  | -0.1895 | 0.4987 | 0.5050  | -0.4987 | 0.4977  |
+| flir_blackfly   | zed2i_rgb_left  | -0.0663 | 0.0956  | -0.0161 | 0.0020 | -0.0081 | 0.0031  | 1.0000  |
+| zed2i_rgb_left  | zed2i_rgb_right | 0.1198  | -0.0003 | -0.0046 | 0.0013 | 0.0013  | 0.0000  | 1.0000  |
+| zed2i_rgb_right | flir_adk        | 0.0251  | -0.0948 | -0.0203 | 0.0026 | -0.0032 | 0.0059  | 1.0000  |
+| flir_adk        | mapir           | -0.1608 | -0.0046 | -0.0138 | 0.0028 | 0.0186  | -0.0094 | 0.9998  |
+
 > :info: `--clock` flag is passed to be able to use the simulation time on the ros nodes. Otherwise, the
 `ApproximateTimeSynchronizer` could not work fine when rosbag restarts
 
