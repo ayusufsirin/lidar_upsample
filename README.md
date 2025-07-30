@@ -62,6 +62,10 @@ rosbag play /home/joseph/Development/DS/2023-05-08-20-25-52.bag -l -s 55 --rate 
 > :info: `--clock` flag is passed to be able to use the simulation time on the ros nodes. Otherwise, the
 `ApproximateTimeSynchronizer` could not work fine when rosbag restarts
 
+z-axis -> RED
+y-axis -> GREEN
+x-axis -> BLUE
+
 ```bash
 rosbag play -l -s 10 -u 10 --clock \
 ~/Development/DS/Citrus-Farm-Dataset/01_13B_Jackal/base_*.bag \
