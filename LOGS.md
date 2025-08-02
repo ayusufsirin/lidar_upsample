@@ -200,8 +200,52 @@ Görüşme sonrası notlar:
 # 27.07.2025
 
 RTABMap ile ZED kamerayı SLAM yapmaya çalışıyorum. TF topic'i ile uğraştım, oldu gibi ama şimdi de ZED kamera PC'u
-rotated görünüyor. 
+rotated görünüyor.
 
-# 28.08.2025
+# 28.07.2025
 
 IMU topic'leri 200 Hz olduğu için 50 Hz olan TF topic'i 4 katına çıkmalı.
+
+# 01.08.2025
+
+Stereo verisi ile SLAM yaptırmayı başardım. Bu veride odom'da bir jump problemi var gibiydi ancak harita fena değildi.
+
+```bash
+roslaunch rtabmap_launch rtabmap.launch \
+ rgb_topic:=/zed2i/zed_node/left/image_rect_color \
+ depth_topic:=/zed2i/zed_node/depth/depth_registered \
+ camera_info_topic:=/zed2i/zed_node/left/camera_info \
+ depth_camera_info_topic:=/zed2i/zed_node/depth/camera_info \
+ imu_topic:=/zed2i/zed_node/imu/data \
+ odom_topic:=/jackal_velocity_controller/odom \
+ frame_id:=zed2i_base_link \
+ approx_sync:=true \
+ wait_imu_to_init:=true \
+ use_sim_time:=true \
+ publish_tf:=false \
+ rtabmap_args:="--delete_db_on_start"
+```
+
+PG çıktısını da RTABMap ile denedim ancak jump problemleri devam etti ve harita daha kötü çıktı. Aslında iyileşmesini
+bekliyordum. jump problemini çözdükten sonra tekrar deneme yapacağım.
+
+```bash
+roslaunch rtabmap_launch rtabmap.launch \
+ rgb_topic:=/zed2i/zed_node/left/image_rect_color \
+ depth_topic:=/islam/pg_depth \
+ camera_info_topic:=/zed2i/zed_node/left/camera_info \
+ depth_camera_info_topic:=/zed2i/zed_node/depth/camera_info \
+ imu_topic:=/zed2i/zed_node/imu/data \
+ odom_topic:=/jackal_velocity_controller/odom \
+ frame_id:=zed2i_base_link \
+ approx_sync:=true \
+ wait_imu_to_init:=true \
+ use_sim_time:=true \
+ publish_tf:=false \
+ rtabmap_args:="--delete_db_on_start"
+```
+
+# 02.08.2025
+
+TF'lerde bir sorun olduğu için RTABMap odom verisinde bir jumping problemi vardı. Sorunun iki kez publish edilen bir TF
+frame'i olduğunu düğünüyorum. Bunu düzeltmeye çalışacağım.
