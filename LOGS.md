@@ -249,3 +249,37 @@ roslaunch rtabmap_launch rtabmap.launch \
 
 TF'lerde bir sorun olduğu için RTABMap odom verisinde bir jumping problemi vardı. Sorunun iki kez publish edilen bir TF
 frame'i olduğunu düğünüyorum. Bunu düzeltmeye çalışacağım.
+
+Aşağıdaki gibi yapınca düzeldi. `publish_tf_odom:=false` argümanını ekledim.
+
+```bash
+roslaunch rtabmap_launch rtabmap.launch \
+ rgb_topic:=/zed2i/zed_node/left/image_rect_color \
+ depth_topic:=/islam/pg_depth \
+ camera_info_topic:=/zed2i/zed_node/left/camera_info \
+ depth_camera_info_topic:=/zed2i/zed_node/depth/camera_info \
+ imu_topic:=/zed2i/zed_node/imu/data \
+ odom_topic:=/jackal_velocity_controller/odom \
+ frame_id:=zed2i_base_link \
+ approx_sync:=true \
+ wait_imu_to_init:=true \
+ use_sim_time:=true \
+ publish_tf:=false \
+ publish_tf_odom:=false \
+ rtabmap_args:="--delete_db_on_start"
+```
+
+Öncesi:
+
+![tf_frames_rtabmap_disabled_publish.png](assets/tf_frames_rtabmap_disabled_publish.png)
+
+Sonrası:
+
+![tf_frames_rtabmap_disabled_publish.png](assets/tf_frames_rtabmap_disabled_publish.png)
+
+İyi kötü bir harita çıktı, not olsun diye koyuyorum ancak güncellenmesi lazım.
+
+![rtabmap_pg_slam_obstacle_map.png](assets/rtabmap_pg_slam_obstacle_map.png)
+
+TF problemi çözüldü ve ZED optical frame'de olması gerektiği halde çalıştı. Ancak ham veri olarak gösteriminde rotated
+görünüyor. Belki de `frame_id`'yi yanlış veriyorumdur.

@@ -145,16 +145,38 @@ roslaunch rtabmap_launch rtabmap.launch \
  camera_info_topic:=/zed2i/zed_node/left/camera_info \
  depth_camera_info_topic:=/zed2i/zed_node/depth/camera_info \
  imu_topic:=/zed2i/zed_node/imu/data \
- odom_topic:=/jackal_velocity_controller/odom \
- frame_id:=zed2i_base_link \
+ frame_id:=map \
  approx_sync:=true \
  wait_imu_to_init:=true \
  use_sim_time:=true \
  publish_tf:=false \
+ publish_tf_odom:=false \
+ publish_tf_map:=false \
+ odom_frame_id:=odom \
  rtabmap_args:="--delete_db_on_start"
 ```
 
 # imu_topic:=/microstrain/imu/data \
+
+PG:
+
+```bash
+roslaunch rtabmap_launch rtabmap.launch \
+ rgb_topic:=/zed2i/zed_node/left/image_rect_color \
+ depth_topic:=/islam/pg_depth \
+ camera_info_topic:=/zed2i/zed_node/left/camera_info \
+ depth_camera_info_topic:=/zed2i/zed_node/depth/camera_info \
+ imu_topic:=/zed2i/zed_node/imu/data \
+ frame_id:=map \
+ approx_sync:=true \
+ wait_imu_to_init:=true \
+ use_sim_time:=true \
+ publish_tf:=false \
+ publish_tf_odom:=false \
+ publish_tf_map:=false \
+ odom_frame_id:=odom \
+ rtabmap_args:="--delete_db_on_start"
+```
 
 ```bash
 rviz -d /media/joseph/Development/GitHub/lidar_upsample/rviz.rviz
