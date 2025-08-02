@@ -91,12 +91,6 @@ rosbag play -l -s 10 -u 10 -r 0.1 --clock \
 ~/Development/DS/Citrus-Farm-Dataset/01_13B_Jackal/gt.bag
 ```
 
-## Run Topic Transformer
-
-```bash
-./transformer_lidar.sh
-```
-
 ## Run Algorithm
 
 ```bash

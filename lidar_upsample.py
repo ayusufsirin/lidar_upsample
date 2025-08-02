@@ -18,8 +18,8 @@ from nav_msgs.msg import Odometry
 from sensor_msgs.msg import PointCloud2
 
 PC_HISTORY_SIZE = 10
-PC_TOPIC = '/islam/vlp_pts'
-ODOM_TOPIC = '/islam/vlp_odom'
+PC_TOPIC = '/velodyne_points'
+ODOM_TOPIC = '/jackal_velocity_controller/odom'
 
 TRANSFORMED_POINT_CLOUD = '/transformed_point_cloud'
 CUMULATIVE_POINT_CLOUD = '/cumulative_point_cloud'
