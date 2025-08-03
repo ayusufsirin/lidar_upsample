@@ -46,7 +46,7 @@ rosbag play /home/joseph/Development/DS/2023-05-08-20-25-52.bag -l -s 55 --rate 
 
 ### CitrusFarm Dataset
 
-# https://ucr-robotics.github.io/Citrus-Farm-Dataset/calibration.html
+https://ucr-robotics.github.io/Citrus-Farm-Dataset/calibration.html
 
 | Parent Frame    | Child Frame     | x[m]    | y[m]    | z[m]    | qx     | qy      | qz      | qw      |
 |-----------------|-----------------|---------|---------|---------|--------|---------|---------|---------|
@@ -127,7 +127,8 @@ roscore
 rosbag play -s 0 -u 100 -r 1.0 --clock \
 ~/Development/DS/Citrus-Farm-Dataset/01_13B_Jackal/base_*.bag \
 ~/Development/DS/Citrus-Farm-Dataset/01_13B_Jackal/zed_*.bag \
-~/Development/DS/Citrus-Farm-Dataset/01_13B_Jackal/odom_*.bag
+~/Development/DS/Citrus-Farm-Dataset/01_13B_Jackal/odom_*.bag \
+~/Development/DS/Citrus-Farm-Dataset/01_13B_Jackal/gt.bag
 ```
 
 ```bash
@@ -145,7 +146,7 @@ roslaunch rtabmap_launch rtabmap.launch \
  camera_info_topic:=/zed2i/zed_node/left/camera_info \
  depth_camera_info_topic:=/zed2i/zed_node/depth/camera_info \
  imu_topic:=/zed2i/zed_node/imu/data \
- frame_id:=map \
+ frame_id:=base_link \
  approx_sync:=true \
  wait_imu_to_init:=true \
  use_sim_time:=true \
@@ -156,8 +157,6 @@ roslaunch rtabmap_launch rtabmap.launch \
  rtabmap_args:="--delete_db_on_start"
 ```
 
-# imu_topic:=/microstrain/imu/data \
-
 PG:
 
 ```bash
@@ -167,7 +166,7 @@ roslaunch rtabmap_launch rtabmap.launch \
  camera_info_topic:=/zed2i/zed_node/left/camera_info \
  depth_camera_info_topic:=/zed2i/zed_node/depth/camera_info \
  imu_topic:=/zed2i/zed_node/imu/data \
- frame_id:=map \
+ frame_id:=base_link \
  approx_sync:=true \
  wait_imu_to_init:=true \
  use_sim_time:=true \
@@ -175,6 +174,7 @@ roslaunch rtabmap_launch rtabmap.launch \
  publish_tf_odom:=false \
  publish_tf_map:=false \
  odom_frame_id:=odom \
+ approx_sync_max_interval:=0.02 \
  rtabmap_args:="--delete_db_on_start"
 ```
 

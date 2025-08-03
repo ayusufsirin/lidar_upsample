@@ -269,6 +269,10 @@ roslaunch rtabmap_launch rtabmap.launch \
  rtabmap_args:="--delete_db_on_start"
 ```
 
+```bash
+rosrun rqt_tf_tree rqt_tf_tree
+```
+
 Öncesi:
 
 ![tf_frames_rtabmap_disabled_publish.png](assets/tf_frames_rtabmap_disabled_publish.png)
@@ -283,3 +287,51 @@ Sonrası:
 
 TF problemi çözüldü ve ZED optical frame'de olması gerektiği halde çalıştı. Ancak ham veri olarak gösteriminde rotated
 görünüyor. Belki de `frame_id`'yi yanlış veriyorumdur.
+
+# 03.08.2025
+
+Aşağıdaki komutlarla harita çıkardım ve çıktılar yine aşağıdaki şekilde. Anladığım kadarıyla odometry topic verince RTABMap kendisi etmitation yapmıyor, sadece harita çıkartıyor.
+
+ZED:
+
+```bash
+roslaunch rtabmap_launch rtabmap.launch \
+ rgb_topic:=/zed2i/zed_node/left/image_rect_color \
+ depth_topic:=/zed2i/zed_node/depth/depth_registered \
+ camera_info_topic:=/zed2i/zed_node/left/camera_info \
+ depth_camera_info_topic:=/zed2i/zed_node/depth/camera_info \
+ imu_topic:=/zed2i/zed_node/imu/data \
+ frame_id:=base_link \
+ approx_sync:=true \
+ wait_imu_to_init:=true \
+ use_sim_time:=true \
+ publish_tf:=false \
+ publish_tf_odom:=false \
+ publish_tf_map:=false \
+ odom_frame_id:=odom \
+ rtabmap_args:="--delete_db_on_start"
+```
+
+PG:
+
+```bash
+roslaunch rtabmap_launch rtabmap.launch \
+ rgb_topic:=/zed2i/zed_node/left/image_rect_color \
+ depth_topic:=/islam/pg_depth \
+ camera_info_topic:=/zed2i/zed_node/left/camera_info \
+ depth_camera_info_topic:=/zed2i/zed_node/depth/camera_info \
+ imu_topic:=/zed2i/zed_node/imu/data \
+ frame_id:=base_link \
+ approx_sync:=true \
+ wait_imu_to_init:=true \
+ use_sim_time:=true \
+ publish_tf:=false \
+ publish_tf_odom:=false \
+ publish_tf_map:=false \
+ odom_frame_id:=odom \
+ approx_sync_max_interval:=0.02 \
+ rtabmap_args:="--delete_db_on_start"
+```
+
+![slam_rtabmap_zed.png](./assets/slam_rtabmap_zed.png)
+![slam_rtabmap_pg.png](./assets/slam_rtabmap_pg.png)
