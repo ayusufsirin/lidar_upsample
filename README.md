@@ -140,7 +140,7 @@ ZED:
 https://medium.com/@basilshaji32/zed2i-vslam-setup-with-rtab-map-using-ros2-a16083630b86
 
 ```bash
-roslaunch rtabmap_launch rtabmap.launch \
+ROS_NAMESPACE=zed roslaunch rtabmap_launch rtabmap.launch \
  rgb_topic:=/zed2i/zed_node/left/image_rect_color \
  depth_topic:=/zed2i/zed_node/depth/depth_registered \
  camera_info_topic:=/zed2i/zed_node/left/camera_info \
@@ -154,13 +154,13 @@ roslaunch rtabmap_launch rtabmap.launch \
  publish_tf_odom:=false \
  publish_tf_map:=false \
  odom_frame_id:=odom \
- rtabmap_args:="--delete_db_on_start"
+ rtabmap_args:="--delete_db_on_start --database_path=/tmp/zed_raw.db"
 ```
 
 PG:
 
 ```bash
-roslaunch rtabmap_launch rtabmap.launch \
+ROS_NAMESPACE=pg roslaunch rtabmap_launch rtabmap.launch \
  rgb_topic:=/zed2i/zed_node/left/image_rect_color \
  depth_topic:=/islam/pg_depth \
  camera_info_topic:=/zed2i/zed_node/left/camera_info \
@@ -175,7 +175,7 @@ roslaunch rtabmap_launch rtabmap.launch \
  publish_tf_map:=false \
  odom_frame_id:=odom \
  approx_sync_max_interval:=0.02 \
- rtabmap_args:="--delete_db_on_start"
+ rtabmap_args:="--delete_db_on_start --database_path=/tmp/zed_pg.db"
 ```
 
 ```bash
