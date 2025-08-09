@@ -344,3 +344,47 @@ karşılaştıramıyorum. Bu problemi çözmeye çalışıyorum.
 
 `namespace` kavramını öğrendim. Bu sayede farklı RTABMap instance'ları farklı ROS2 topic isimleri alabiliyor ve çakışma
 olmuyor.
+
+# 09.08.2025
+
+Artık aynı odom verisini üretmeyen RTABMap komutları yazmaya çalışacağım. Sonra çıktıları kıyaslayabilirim.
+
+Refs:
+
+- https://docs.ros.org/en/melodic/api/robot_localization/html/index.html
+- RTAB-Map Presentation: https://introlab.3it.usherbrooke.ca/images/3/31/Labbe2015ULaval.pdf
+- RTAB-Map ROS: http://wiki.ros.org/rtabmap_ros/noetic_and_newer
+- RTAB-Map RDB-D mapping paper: https://introlab.3it.usherbrooke.ca/images/e/eb/Labbe14-IROS.pdf
+
+En son yaptığım testlerde RTAB-Map RGB-D odom çıktısının aslında olduğunu ama "Not enough inlier" probleminden dolayı
+kesildiğini anladım. Problem ZED kamera ile yaptığım denemelerde dönme esasında peydah oluyordu. Bu problemi çözmek için
+Chat GPT-5 ile muhabbet ettim ve bana dönerken olmasının klasik olduğunu söyledi. RTAB-Map parametreleri ile oynayarak
+bu problemi çözebileceğimi açıkladı.
+
+ChatGPT export: [Explain_RTAB-Map_command](./docs/ChatGPT-Explain_RTAB-Map_command.md)
+
+```bash
+ROS_NAMESPACE=zed roslaunch rtabmap_launch rtabmap.launch \
+ rgb_topic:=/zed2i/zed_node/left/image_rect_color \
+ depth_topic:=/zed2i/zed_node/depth/depth_registered \
+ camera_info_topic:=/zed2i/zed_node/left/camera_info \
+ depth_camera_info_topic:=/zed2i/zed_node/depth/camera_info \
+ imu_topic:=/zed2i/zed_node/imu/data \
+ frame_id:=base_link \
+ approx_sync:=true \
+ wait_imu_to_init:=true \
+ use_sim_time:=true \
+ publish_tf:=false \
+ publish_tf_odom:=false \
+ publish_tf_map:=false \
+ odom_frame_id:=odom \
+ subscribe_odom:=false \
+ approx_sync_max_interval:=0.05 \
+ rtabmap_args:="--delete_db_on_start --database_path=/tmp/zed_raw.db \
+                --Odom/MinInliers 10 \
+                --OdomF2M/KeyFrameThr 0.3"
+```
+
+Yukaridaki komut ile denediğimde aşağıdaki gibi odom çıktısı aldım:
+
+![img.png](assets/rtabmap_zed_odom_v0.1.png)

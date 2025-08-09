@@ -155,7 +155,10 @@ ROS_NAMESPACE=zed roslaunch rtabmap_launch rtabmap.launch \
  publish_tf_map:=false \
  odom_frame_id:=odom \
  subscribe_odom:=false \
- rtabmap_args:="--delete_db_on_start --database_path=/tmp/zed_raw.db"
+ approx_sync_max_interval:=0.05 \
+ rtabmap_args:="--delete_db_on_start --database_path=/tmp/zed_raw.db \
+                --Odom/MinInliers 10 \
+                --OdomF2M/KeyFrameThr 0.3"
 ```
 
 PG:
