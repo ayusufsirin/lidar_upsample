@@ -290,7 +290,8 @@ görünüyor. Belki de `frame_id`'yi yanlış veriyorumdur.
 
 # 03.08.2025
 
-Aşağıdaki komutlarla harita çıkardım ve çıktılar yine aşağıdaki şekilde. Anladığım kadarıyla odometry topic verince RTABMap kendisi etmitation yapmıyor, sadece harita çıkartıyor.
+Aşağıdaki komutlarla harita çıkardım ve çıktılar yine aşağıdaki şekilde. Anladığım kadarıyla odometry topic verince
+RTABMap kendisi etmitation yapmıyor, sadece harita çıkartıyor.
 
 ZED:
 
@@ -335,3 +336,11 @@ roslaunch rtabmap_launch rtabmap.launch \
 
 ![slam_rtabmap_zed.png](./assets/slam_rtabmap_zed.png)
 ![slam_rtabmap_pg.png](./assets/slam_rtabmap_pg.png)
+
+# 04.08.2025
+
+Şimdiki problem odom verisinin wheel encoder ile aynı olması. Böyle olduğu için PG ve ZED performanısı
+karşılaştıramıyorum. Bu problemi çözmeye çalışıyorum.
+
+`namespace` kavramını öğrendim. Bu sayede farklı RTABMap instance'ları farklı ROS2 topic isimleri alabiliyor ve çakışma
+olmuyor.

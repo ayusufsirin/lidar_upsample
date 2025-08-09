@@ -154,6 +154,7 @@ ROS_NAMESPACE=zed roslaunch rtabmap_launch rtabmap.launch \
  publish_tf_odom:=false \
  publish_tf_map:=false \
  odom_frame_id:=odom \
+ subscribe_odom:=false \
  rtabmap_args:="--delete_db_on_start --database_path=/tmp/zed_raw.db"
 ```
 
@@ -174,6 +175,7 @@ ROS_NAMESPACE=pg roslaunch rtabmap_launch rtabmap.launch \
  publish_tf_odom:=false \
  publish_tf_map:=false \
  odom_frame_id:=odom \
+ subscribe_odom:=false \
  approx_sync_max_interval:=0.02 \
  rtabmap_args:="--delete_db_on_start --database_path=/tmp/zed_pg.db"
 ```
