@@ -387,4 +387,40 @@ ROS_NAMESPACE=zed roslaunch rtabmap_launch rtabmap.launch \
 
 Yukaridaki komut ile denediğimde aşağıdaki gibi odom çıktısı aldım:
 
-![img.png](assets/rtabmap_zed_odom_v0.1.png)
+![rtabmap_zed_odom_v0.1.png](assets/rtabmap_zed_odom_v0.1.png)
+
+# 17.08.2025
+
+Ayni RTAB-Map denemelerini PG ile denediğimde zamanlama ile ilgili hatalar alıyorum. İncelediğimde gördüğüm kadarıyla PG
+çıksıtı oluşana kadar geçen süre header'lara iyiyansımıyor gibi. Bunun üzerine gideceğim.
+
+# 19.08.2025
+
+Her seferinde çalışan konfigürasyonu buldum. ROS bag replay hızı `0.5` olunca ve açağıdaki komutla çalıştırınca
+sorun olmuyor:
+
+```bash
+ROS_NAMESPACE=zed roslaunch rtabmap_launch rtabmap.launch \
+ rgb_topic:=/zed2i/zed_node/left/image_rect_color \
+ depth_topic:=/zed2i/zed_node/depth/depth_registered \
+ camera_info_topic:=/zed2i/zed_node/left/camera_info \
+ depth_camera_info_topic:=/zed2i/zed_node/depth/camera_info \
+ imu_topic:=/zed2i/zed_node/imu/data \
+ frame_id:=base_link \
+ approx_sync:=true \
+ wait_imu_to_init:=true \
+ use_sim_time:=true \
+ publish_tf:=false \
+ publish_tf_odom:=false \
+ publish_tf_map:=false \
+ odom_frame_id:=odom \
+ subscribe_odom:=false \
+ approx_sync_max_interval:=0.05 \
+ rtabmap_args:="--delete_db_on_start --database_path=/tmp/zed_raw.db \
+                 --Odom/Strategy 1 \
+                 --OdomF2M/KeyFrameThr 0.3 \
+                 --Vis/FeatureType 2 \
+                 --Vis/MaxFeatures 2000 \
+                 --Vis/CorNNDR 0.7 \
+                 --Odom/MinInliers 10"
+```

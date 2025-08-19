@@ -124,7 +124,7 @@ roscore
 > :warning: GT olmadan bag oynat!
 
 ```bash
-rosbag play -s 0 -u 100 -r 1.0 --clock \
+rosbag play -s 0 -u 100 -r 0.5 --clock \
 ~/Development/DS/Citrus-Farm-Dataset/01_13B_Jackal/base_*.bag \
 ~/Development/DS/Citrus-Farm-Dataset/01_13B_Jackal/zed_*.bag \
 ~/Development/DS/Citrus-Farm-Dataset/01_13B_Jackal/odom_*.bag \
@@ -157,8 +157,12 @@ ROS_NAMESPACE=zed roslaunch rtabmap_launch rtabmap.launch \
  subscribe_odom:=false \
  approx_sync_max_interval:=0.05 \
  rtabmap_args:="--delete_db_on_start --database_path=/tmp/zed_raw.db \
-                --Odom/MinInliers 10 \
-                --OdomF2M/KeyFrameThr 0.3"
+                 --Odom/Strategy 1 \
+                 --OdomF2M/KeyFrameThr 0.3 \
+                 --Vis/FeatureType 2 \
+                 --Vis/MaxFeatures 2000 \
+                 --Vis/CorNNDR 0.7 \
+                 --Odom/MinInliers 10"
 ```
 
 PG:
@@ -179,8 +183,14 @@ ROS_NAMESPACE=pg roslaunch rtabmap_launch rtabmap.launch \
  publish_tf_map:=false \
  odom_frame_id:=odom \
  subscribe_odom:=false \
- approx_sync_max_interval:=0.02 \
- rtabmap_args:="--delete_db_on_start --database_path=/tmp/zed_pg.db"
+ approx_sync_max_interval:=0.05 \
+ rtabmap_args:="--delete_db_on_start --database_path=/tmp/pg_raw.db \
+                 --Odom/Strategy 1 \
+                 --OdomF2M/KeyFrameThr 0.3 \
+                 --Vis/FeatureType 2 \
+                 --Vis/MaxFeatures 2000 \
+                 --Vis/CorNNDR 0.7 \
+                 --Odom/MinInliers 10"
 ```
 
 ```bash
