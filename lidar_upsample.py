@@ -21,6 +21,8 @@ PC_HISTORY_SIZE = 10
 PC_TOPIC = '/velodyne_points'
 ODOM_TOPIC = '/jackal_velocity_controller/odom'
 
+PUBLISH_SUBTOPICS = False
+
 TRANSFORMED_POINT_CLOUD = '/transformed_point_cloud'
 CUMULATIVE_POINT_CLOUD = '/cumulative_point_cloud'
 CUMULATIVE_ORIGIN_POINT_CLOUD = '/cumulative_origin_point_cloud'
@@ -117,11 +119,12 @@ class PointCloudTransformer:
         ts.registerCallback(self.synced_callback)
 
         # Initialize publishers
-        self.point_cloud_pub = rospy.Publisher(TRANSFORMED_POINT_CLOUD, PointCloud2, queue_size=10)
-        self.cumulative_cloud_pub = rospy.Publisher(CUMULATIVE_POINT_CLOUD, PointCloud2, queue_size=10)
+        if PUBLISH_SUBTOPICS:
+            self.point_cloud_pub = rospy.Publisher(TRANSFORMED_POINT_CLOUD, PointCloud2, queue_size=10)
+            self.cumulative_cloud_pub = rospy.Publisher(CUMULATIVE_POINT_CLOUD, PointCloud2, queue_size=10)
+            self.odom_pub = rospy.Publisher('/transformed_odom', Odometry, queue_size=10)
         self.cumulative_origin_cloud_pub = rospy.Publisher(CUMULATIVE_ORIGIN_POINT_CLOUD, PointCloud2,
                                                            queue_size=10)  # NEW PUBLISHER
-        self.odom_pub = rospy.Publisher('/transformed_odom', Odometry, queue_size=10)
 
     def calculate_rate(self, timestamps):
         if len(timestamps) < 2:
@@ -159,7 +162,9 @@ class PointCloudTransformer:
                 pc_callback_stats = self.point_cloud_callback(point_cloud_msg, translation, rotation)
                 pc_callback_duration_ms = (time.time() - pc_callback_start_time) * 1000.0
 
-                self.odom_pub.publish(transformed_odom_msg)
+                if PUBLISH_SUBTOPICS:
+                    transformed_odom_msg.header.stamp = rospy.get_rostime().now()
+                    self.odom_pub.publish(transformed_odom_msg)
 
                 # Save metrics
                 processing_duration_ms = (time.time() - start_time) * 1000.0
@@ -231,7 +236,7 @@ class PointCloudTransformer:
         # %% Step 1: Convert PointCloud2 to list of full points (all fields)
         pc_to_points_start_time = time.time()
         xyz_cp = cp.asarray(list(pc2.read_points(point_cloud_msg, skip_nans=True, field_names=("x", "y", "z"))),
-                       dtype=cp.float32)
+                            dtype=cp.float32)
         pc_to_points_duration_ms = (time.time() - pc_to_points_start_time) * 1000.0
 
         # %% Step 2: Transform Points with CuPy
@@ -247,26 +252,34 @@ class PointCloudTransformer:
 
         # %% Step 4: Create and publish transformed point cloud
         pc_create_start_time = time.time()
-        transformed_msg = create_cloud_from_np(
-            point_cloud_msg.header,
-            point_cloud_msg.fields,
-            transformed_points
-        )
+        transformed_msg = None
+        if PUBLISH_SUBTOPICS:
+            transformed_msg = create_cloud_from_np(
+                point_cloud_msg.header,
+                point_cloud_msg.fields,
+                transformed_points
+            )
         pc_create_duration_ms = (time.time() - pc_create_start_time) * 1000.0
-        self.point_cloud_pub.publish(transformed_msg)
+        if PUBLISH_SUBTOPICS:
+            transformed_msg.header.stamp = rospy.get_rostime().now()
+            self.point_cloud_pub.publish(transformed_msg)
 
         # %% Step 5: Update cumulative transformed cloud
         cumulative_points_start_time = time.time()
         self.cumulative_points.append(transformed_points)
         points_cumulative_transformed = np.vstack(self.cumulative_points)
         cumulative_points_create_cloud_start_time = time.time()
-        cumulative_msg = create_cloud_from_np(
-            point_cloud_msg.header,
-            point_cloud_msg.fields,
-            points_cumulative_transformed
-        )
+        cumulative_msg = None
+        if PUBLISH_SUBTOPICS:
+            cumulative_msg = create_cloud_from_np(
+                point_cloud_msg.header,
+                point_cloud_msg.fields,
+                points_cumulative_transformed
+            )
         cumulative_points_create_cloud_duration_ms = (time.time() - cumulative_points_create_cloud_start_time) * 1000.0
-        self.cumulative_cloud_pub.publish(cumulative_msg)
+        if PUBLISH_SUBTOPICS:
+            cumulative_msg.header.stamp = rospy.get_rostime().now()
+            self.cumulative_cloud_pub.publish(cumulative_msg)
         cumulative_points_duration_ms = (time.time() - cumulative_points_start_time) * 1000.0
 
         # %% Step 6: Translate points back to origin
@@ -286,6 +299,7 @@ class PointCloudTransformer:
         )
         cum_origin_points_create_cloud_duration_ms = (time.time() - cum_origin_create_cloud_start_time) * 1000.0
 
+        cumulative_origin_msg.header.stamp = rospy.get_rostime().now()
         self.cumulative_origin_cloud_pub.publish(cumulative_origin_msg)
         cumulative_origin_points_duration_ms = (time.time() - cumulative_origin_points_start_time) * 1000.0
 
