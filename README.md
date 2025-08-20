@@ -124,7 +124,7 @@ roscore
 > :warning: GT olmadan bag oynat!
 
 ```bash
-rosbag play -s 0 -u 100 -r 0.5 --clock \
+rosbag play -s 0 -u 200 -r 0.2 --clock \
 ~/Development/DS/Citrus-Farm-Dataset/01_13B_Jackal/base_*.bag \
 ~/Development/DS/Citrus-Farm-Dataset/01_13B_Jackal/zed_*.bag \
 ~/Development/DS/Citrus-Farm-Dataset/01_13B_Jackal/odom_*.bag \
@@ -169,7 +169,7 @@ PG:
 
 ```bash
 ROS_NAMESPACE=pg roslaunch rtabmap_launch rtabmap.launch \
- rgb_topic:=/zed2i/zed_node/left/image_rect_color \
+ rgb_topic:=/islam/pg_rgb \
  depth_topic:=/islam/pg_depth \
  camera_info_topic:=/zed2i/zed_node/left/camera_info \
  depth_camera_info_topic:=/zed2i/zed_node/depth/camera_info \
