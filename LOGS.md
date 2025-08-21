@@ -424,3 +424,14 @@ ROS_NAMESPACE=zed roslaunch rtabmap_launch rtabmap.launch \
                  --Vis/CorNNDR 0.7 \
                  --Odom/MinInliers 10"
 ```
+
+# 20.08.2025
+
+Bugün kayıtlar aldım ve ZED ve PG için RTAB-Map çıktılarını karşılaştırdım. Açağıdaki GIF'te görüldüğü gibi PG çıktısı
+daha iyi bir sonuç verdi.
+
+```bash
+./compare_tf.sh
+```
+
+![Odom Comparison](assets/Peek%202025-08-21%2007-06.gif)

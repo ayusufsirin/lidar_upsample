@@ -124,6 +124,7 @@ roscore
 > :warning: GT olmadan bag oynat!
 
 ```bash
+rosparam set use_sim_time true
 rosbag play -s 0 -u 200 -r 0.2 --clock \
 ~/Development/DS/Citrus-Farm-Dataset/01_13B_Jackal/base_*.bag \
 ~/Development/DS/Citrus-Farm-Dataset/01_13B_Jackal/zed_*.bag \
@@ -132,12 +133,18 @@ rosbag play -s 0 -u 200 -r 0.2 --clock \
 ```
 
 ```bash
+rosparam set use_sim_time true
 /home/joseph/PycharmProjects/citrusFarmSFITC/citrus_farm_dataset_tf_publisher.sh
 ```
 
 ZED:
 
 https://medium.com/@basilshaji32/zed2i-vslam-setup-with-rtab-map-using-ros2-a16083630b86
+
+```bash
+rosparam set use_sim_time true
+rosbag record /zed/rtabmap/odom
+```
 
 ```bash
 ROS_NAMESPACE=zed roslaunch rtabmap_launch rtabmap.launch \
@@ -168,6 +175,11 @@ ROS_NAMESPACE=zed roslaunch rtabmap_launch rtabmap.launch \
 PG:
 
 ```bash
+rosparam set use_sim_time true
+rosbag record /pg/rtabmap/odom
+```
+
+```bash
 ROS_NAMESPACE=pg roslaunch rtabmap_launch rtabmap.launch \
  rgb_topic:=/islam/pg_rgb \
  depth_topic:=/islam/pg_depth \
@@ -194,5 +206,32 @@ ROS_NAMESPACE=pg roslaunch rtabmap_launch rtabmap.launch \
 ```
 
 ```bash
+rosparam set use_sim_time true
 rviz -d /media/joseph/Development/GitHub/lidar_upsample/rviz.rviz
+```
+
+## Comparison
+
+```bash
+roscore
+```
+
+```bash
+rosparam set use_sim_time true
+/home/joseph/PycharmProjects/citrusFarmSFITC/citrus_farm_dataset_tf_publisher.sh
+```
+
+```bash
+rosparam set use_sim_time true
+/media/joseph/Development/GitHub/lidar_upsample/compare_tf.sh
+```
+
+```bash
+rosparam set use_sim_time true
+rosbag play -s 0 -u 200 --clock ~/Development/DS/Citrus-Farm-Dataset/01_13B_Jackal/odom_*.bag ~/Development/DS/Citrus-Farm-Dataset/01_13B_Jackal/gt.bag ~/PycharmProjects/citrusFarmSFITC/rtabmap_*.bag
+```
+
+```bash
+rosparam set use_sim_time true
+rviz -d compare.rviz 
 ```
