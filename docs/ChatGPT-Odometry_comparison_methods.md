@@ -1857,3 +1857,46 @@ Also write a summary paragrapgh that briefly explains in which conditions which 
 
 #### ChatGPT:
 **Summary.** On this 200-s slice, **PG** is the safer choice when you care about **end-to-end/global accuracy and robustness**: it has lower ATE RMSE than ZED (both Sim(3) and SE(3)), and its distance-based RPE shows **fewer large drifts** (lower RMSE at 50 m and 100 m). **ZED**, however, tends to have **slightly smaller medians** and a **better \~1 s RPE**, i.e., it’s a bit steadier over short horizons—useful for **real-time control** and smooth local motion. At **1 m RPE** they’re essentially tied; at **50 m** ZED’s lower median suggests smoother accumulation but with **spikier outliers** (which raise its RMSE), whereas PG keeps the tails in check. Orientation over 50 m (full 3D angle) looks similarly large for both; for **heading-only** use yaw-projected RPE with a motion filter—expect differences to shrink or flip depending on turns and standstills. **Rule of thumb:** pick **PG** for mapping, loop-closure quality, and reliability under perturbations; pick **ZED** when short-latency tracking smoothness matters more than rare large errors.
+
+
+#### You:
+Make similar comments on that with same details for the previous csv
+
+#### ChatGPT:
+\[Unsupported Content]
+
+
+#### ChatGPT:
+\[Unsupported Content]
+
+
+#### ChatGPT:
+\[Unsupported Content]
+
+
+#### ChatGPT:
+\[Unsupported Content]
+
+
+#### ChatGPT:
+\[Unsupported Content]
+
+
+#### ChatGPT:
+\[Unsupported Content]
+
+
+#### ChatGPT:
+\[Unsupported Content]
+
+
+#### ChatGPT:
+\[Unsupported Content]
+
+
+#### ChatGPT:
+Here are paper-ready comments for the **previous CSV** (`metrics_all.csv`), in the same style as before.
+
+**Numerical comparison (200-s window).** Globally, **PG** is better than **ZED** on ATE: **SE(3) RMSE 0.912 m vs 1.105 m** (≈**17.5%** lower for PG) and **Sim(3) RMSE 0.912 m vs 1.105 m** (≈**17.4%** lower). ZED’s **median ATE** is slightly smaller (SE3 **0.831 m** vs **0.884 m**; Sim3 **0.842 m** vs **0.884 m**), indicating tighter central errors for ZED but heavier tails; PG reduces outliers (lower RMSE/mean). Locally, at **RPE-1 m** they’re essentially tied (**RMSE 1.452 m (PG) vs 1.464 m (ZED)**; medians **1.216 m vs 1.198 m**). At **RPE-50 m**, PG has lower RMSE (**28.776 m vs 29.893 m**, ≈**3.7%** better), while ZED’s median is lower (**12.953 m vs 15.274 m**), again suggesting ZED is smoother on average but with larger tails. At **RPE-100 m**, PG is clearly lower (**2.537 m vs 3.972 m**, ≈**36%** better), though note the limited number of valid segments in this cropped run. For short-horizon drift (**\~1 s**, frame-based), **ZED** is slightly better (**RMSE 3.251 m vs 3.348 m**, ≈**3%** lower; medians **2.345 m vs 2.598 m**). The **50 m rotation-angle RPE** (full 3D angle) is very large for both and nearly identical (**RMSE 126.9° (ZED) vs 128.1° (PG)**); interpret with caution—this is the full 3D angle, not yaw-only. *(Note: the unlabeled “APE .zip” rows in the CSV appear to come from a different aggregation; we base conclusions on the explicit SE(3)/Sim(3) APE rows.)*
+
+**Summary.** For this slice, choose **PG** when you care about **global accuracy/robustness** and **longer-segment drift** (better ATE RMSE and lower RPE at 50–100 m). Choose **ZED** when **short-horizon steadiness** matters (slightly better \~1 s RPE and smaller ATE medians), accepting that it shows **spikier outliers** that raise RMSE at longer scales. Orientation over 50 m looks similarly large for both with the full-angle metric; if heading is the focus, use a **yaw-projected RPE** with a motion filter—the relative ranking may narrow or flip depending on turning vs standstill portions.
