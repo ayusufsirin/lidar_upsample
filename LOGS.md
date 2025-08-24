@@ -435,3 +435,14 @@ daha iyi bir sonuç verdi.
 ```
 
 ![Odom Comparison](assets/Peek%202025-08-21%2007-06.gif)
+
+# 22.08.2025
+
+Engebeli arazilerde Lidar sallanacağından taradığı alan FOV olarak artacaktır çünkü historical bir gözlem yapılıyor (
+lidar_upsample)
+
+# 24.08.2025
+
+`evo` kullanarak karşılaştırmaları yaptırdım. Sonuçlar iyi duruyor.
+
+

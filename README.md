@@ -125,7 +125,7 @@ roscore
 
 ```bash
 rosparam set use_sim_time true
-rosbag play -s 0 -u 200 -r 0.2 --clock \
+rosbag play -s 0 -u 400 -r 0.5 --clock \
 ~/Development/DS/Citrus-Farm-Dataset/01_13B_Jackal/base_*.bag \
 ~/Development/DS/Citrus-Farm-Dataset/01_13B_Jackal/zed_*.bag \
 ~/Development/DS/Citrus-Farm-Dataset/01_13B_Jackal/odom_*.bag \
@@ -235,3 +235,7 @@ rosbag play -s 0 -u 200 --clock ~/Development/DS/Citrus-Farm-Dataset/01_13B_Jack
 rosparam set use_sim_time true
 rviz -d compare.rviz 
 ```
+
+### Evolution
+
+
