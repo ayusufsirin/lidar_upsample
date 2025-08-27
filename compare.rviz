@@ -12,7 +12,6 @@ Panels:
         - /RTAB-Map PG Odometry1
         - /RTAB-Map PG Odometry1/Shape1
         - /RTAB-Map ZED Odometry1
-        - /RTAB-Map ZED Odometry1/Status1
         - /RTAB-Map ZED Odometry1/Shape1
       Splitter Ratio: 0.5
     Tree Height: 756
@@ -298,7 +297,7 @@ Visualization Manager:
   Views:
     Current:
       Class: rviz/Orbit
-      Distance: 46723.6953125
+      Distance: 78546.1484375
       Enable Stereo Rendering:
         Stereo Eye Separation: 0.05999999865889549
         Stereo Focal Distance: 1
@@ -306,17 +305,17 @@ Visualization Manager:
         Value: false
       Field of View: 0.0010000000474974513
       Focal Point:
-        X: 21.5299072265625
-        Y: -14.467655181884766
-        Z: 0.02155875787138939
+        X: 30.56658172607422
+        Y: -37.27592086791992
+        Z: 9.799015045166016
       Focal Shape Fixed Size: false
       Focal Shape Size: 0.05000000074505806
       Invert Z Axis: false
       Name: Current View
       Near Clip Distance: 0.009999999776482582
-      Pitch: 0.704796552658081
+      Pitch: 0.5347961783409119
       Target Frame: <Fixed Frame>
-      Yaw: 2.9345974922180176
+      Yaw: 2.704594850540161
     Saved: ~
 Window Geometry:
   Displays:

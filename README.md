@@ -228,7 +228,7 @@ rosparam set use_sim_time true
 
 ```bash
 rosparam set use_sim_time true
-rosbag play -s 0 -u 200 --clock ~/Development/DS/Citrus-Farm-Dataset/01_13B_Jackal/odom_*.bag ~/Development/DS/Citrus-Farm-Dataset/01_13B_Jackal/gt.bag ~/PycharmProjects/citrusFarmSFITC/rtabmap_*.bag
+rosbag play -s 0 -u 200 --clock ~/Development/DS/Citrus-Farm-Dataset/01_13B_Jackal/odom_*.bag ~/Development/DS/Citrus-Farm-Dataset/01_13B_Jackal/gt.bag ~/PycharmProjects/citrusFarmSFITC/rosbag/rtabmap_*.bag
 ```
 
 ```bash

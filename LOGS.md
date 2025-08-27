@@ -445,4 +445,14 @@ lidar_upsample)
 
 `evo` kullanarak karşılaştırmaları yaptırdım. Sonuçlar iyi duruyor.
 
+# 27.08.2025
+
+Bugün hocayla görüşmeye geldim. Sonuçları değerlendirdik. Yapmam gerekenler:
+
+- PG olmadan sadece lidar upsample ile PG olan sonucun karşılaştırması yapılmalı. Gerçek bir iyileşme oluyor mu diye test edilmeli.
+- Indoor bir veriseti ile de deneme yapılmalı. Outdoor için de başka verisetleri de incelenmeli.
+- Eren Cem hocanın ODTÜ'de topladığı verisetleri için de evaluation yapılmalı.
+- Yapılan işlerden sonra tekrar hocayla görüşülmeli ve makale için hikaye netleştirilmeli.
+- Makaleye konulacak görseller ve tablolar bir yandan oluşturulmalı. Bunun için _**IEEE Transactions on Robotics**_ dergilerindeki ilgili makaleler incelenmeli.
+- Overleaf üzerinde bir taslak (_**IEEE Transactions on Robotics**_) oluşturulup hoca ile paylaşılmalı. [uyanik@jhu.edu](mailto:uyanik@jhu.edu)
 
