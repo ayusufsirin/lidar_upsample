@@ -456,3 +456,19 @@ Bugün hocayla görüşmeye geldim. Sonuçları değerlendirdik. Yapmam gerekenl
 - Makaleye konulacak görseller ve tablolar bir yandan oluşturulmalı. Bunun için _**IEEE Transactions on Robotics**_ dergilerindeki ilgili makaleler incelenmeli.
 - Overleaf üzerinde bir taslak (_**IEEE Transactions on Robotics**_) oluşturulup hoca ile paylaşılmalı. [uyanik@jhu.edu](mailto:uyanik@jhu.edu)
 
+# 29.08.2025
+
+PG olmadan sadece lıdar upsample ile RTAB-Map SLAM kaydı aldım. Bu kaydı PG olan ile ve ZED ile karşılaştıracağım.
+
+Bunun için `main.py` dosyasında aşağıdaki satırı değitirdim:
+
+```python
+# pg_depth_cropped = pg(zed_depth_cropped.copy(), vlp_depth_cropped.copy(), threshold=CURRENT_THRESHOLD)
+pg_depth_cropped = vlp_depth_cropped.copy()
+```
+
+[rtabmap_no_pg_odom_2025-08-29-22-27-06.bag](../../../../../home/joseph/PycharmProjects/citrusFarmSFITC/rosbag/rtabmap_no_pg_odom_2025-08-29-22-27-06.bag)
+
+![rtabmap_no_pg_slam.png](assets/rtabmap_no_pg_slam.png)
+
+![rtabmap_no_pg_slam.gif](assets/Peek%202025-08-29%2023-15.gif)
