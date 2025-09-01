@@ -11,6 +11,7 @@ Panels:
         - /islam/PointCloud21/PointCloud2 PG Rainbow1/Autocompute Value Bounds1
         - /Raw1/Odometry Wheel Enc.1/Shape1
         - /ZED RTABMap1
+        - /ZED RTABMap1/Odometry1
         - /PG RTABMap1
         - /PG RTABMap1/Odometry1/Shape1
       Splitter Ratio: 0.5907257795333862
@@ -712,7 +713,7 @@ Visualization Manager:
             Shaft Length: 1
             Shaft Radius: 0.05000000074505806
             Value: Arrow
-          Topic: /zed/rtabmap/odom
+          Topic: /zed/rtabmap/odom90
           Unreliable: false
           Value: true
       Enabled: true
@@ -919,7 +920,7 @@ Visualization Manager:
   Views:
     Current:
       Class: rviz/Orbit
-      Distance: 11.881038665771484
+      Distance: 359.5733947753906
       Enable Stereo Rendering:
         Stereo Eye Separation: 0.05999999865889549
         Stereo Focal Distance: 1
@@ -927,17 +928,17 @@ Visualization Manager:
         Value: false
       Field of View: 0.7853981852531433
       Focal Point:
-        X: 3.0284008979797363
-        Y: -3.8860669136047363
-        Z: 5.608104228973389
+        X: -29.391220092773438
+        Y: -89.60034942626953
+        Z: -10.675338745117188
       Focal Shape Fixed Size: false
       Focal Shape Size: 0.05000000074505806
       Invert Z Axis: false
       Name: Current View
       Near Clip Distance: 0.009999999776482582
-      Pitch: 0.3952026963233948
+      Pitch: 0.3197964131832123
       Target Frame: <Fixed Frame>
-      Yaw: 3.1907787322998047
+      Yaw: 3.2507827281951904
     Saved: ~
 Window Geometry:
   Displays:

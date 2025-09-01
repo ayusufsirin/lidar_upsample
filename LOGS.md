@@ -449,12 +449,15 @@ lidar_upsample)
 
 Bugün hocayla görüşmeye geldim. Sonuçları değerlendirdik. Yapmam gerekenler:
 
-- PG olmadan sadece lidar upsample ile PG olan sonucun karşılaştırması yapılmalı. Gerçek bir iyileşme oluyor mu diye test edilmeli.
+- PG olmadan sadece lidar upsample ile PG olan sonucun karşılaştırması yapılmalı. Gerçek bir iyileşme oluyor mu diye
+  test edilmeli.
 - Indoor bir veriseti ile de deneme yapılmalı. Outdoor için de başka verisetleri de incelenmeli.
 - Eren Cem hocanın ODTÜ'de topladığı verisetleri için de evaluation yapılmalı.
 - Yapılan işlerden sonra tekrar hocayla görüşülmeli ve makale için hikaye netleştirilmeli.
-- Makaleye konulacak görseller ve tablolar bir yandan oluşturulmalı. Bunun için _**IEEE Transactions on Robotics**_ dergilerindeki ilgili makaleler incelenmeli.
-- Overleaf üzerinde bir taslak (_**IEEE Transactions on Robotics**_) oluşturulup hoca ile paylaşılmalı. [uyanik@jhu.edu](mailto:uyanik@jhu.edu)
+- Makaleye konulacak görseller ve tablolar bir yandan oluşturulmalı. Bunun için _**IEEE Transactions on Robotics**_
+  dergilerindeki ilgili makaleler incelenmeli.
+- Overleaf üzerinde bir taslak (_**IEEE Transactions on Robotics**_) oluşturulup hoca ile
+  paylaşılmalı. [uyanik@jhu.edu](mailto:uyanik@jhu.edu)
 
 # 29.08.2025
 
@@ -472,3 +475,12 @@ pg_depth_cropped = vlp_depth_cropped.copy()
 ![rtabmap_no_pg_slam.png](assets/rtabmap_no_pg_slam.png)
 
 ![rtabmap_no_pg_slam.gif](assets/Peek%202025-08-29%2023-15.gif)
+
+# 30.08.2025
+
+Şekilde görülen yükseliş roll eksenindeki açısal bir offset'ten kaynaklanıyor olabilir. Bu offseti bulup düzelterek
+tekrar RTAB-Map çıktısını karşılaştırmak iyi olacak gibi.
+
+![z_elevation_imu_roll_offset.png](assets/z_elevation_imu_roll_offset.png)
+
+RTAB-Map'in her defasında aynı çıktıyı verip vermediğini test etmeliyim.
